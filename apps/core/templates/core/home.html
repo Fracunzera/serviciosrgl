@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block cabezal %}
+<div class="cabezal">
+  <span>Índice de rubros</span>
+  <span class="cabezal__centro">{{ city.nombre }} · Santa Cruz</span>
+  <span>Pág. 1</span>
+</div>
+{% endblock %}
+
+{% block contenido %}
+<div class="portada">
+  {# Urgencias primero en el DOM: en mobile es lo primero que se ve. #}
+  <section class="aviso aviso--negro urgencias portada__urgencias" aria-labelledby="titulo-urgencias">
+    <div class="aviso__cuerpo">
+      <h2 id="titulo-urgencias">Urgencias de fin de semana</h2>
+      <p>¿Pérdida de agua, corte de luz, olor a gas o te quedaste afuera un sábado? La línea de urgencias deriva tu pedido al oficio que está de guardia.</p>
+      <ul>
+        {% for r in urgencias %}<li>{{ r.nombre }}</li>{% endfor %}
+      </ul>
+      <span class="boton boton--claro" aria-disabled="true">Pedir urgencia · próximamente</span>
+    </div>
+  </section>
+  <section class="portada__indice" aria-labelledby="titulo-indice">
+    <h1 class="rubro-titulo" id="titulo-indice">Índice de rubros</h1>
+    <p class="ver-tambien">Buscá el oficio por rubro. Todos los perfiles los aprueba la guía, con DNI verificado.</p>
+
+    <ul class="pestanas" aria-label="Letras">
+      {% for letra, _ in indice %}<li><a href="#letra-{{ letra }}">{{ letra }}</a></li>{% endfor %}
+    </ul>
+
+    <div class="columnas">
+      {% for letra, rubros in indice %}
+      <div class="letra" id="letra-{{ letra }}">
+        <span class="letra__marca" aria-hidden="true">{{ letra }}</span>
+        <ul>
+          {% for r in rubros %}
+          <li>
+            <a class="linea" href="{% url 'directorio:rubro' city.slug r.slug %}">
+              <span class="entrada__nombre">{{ r.nombre }}</span>
+              <span class="linea__puntos" aria-hidden="true"></span>
+              <span class="linea__dato">{{ r.cantidad }} oficio{{ r.cantidad|pluralize }}</span>
+            </a>
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+
+
+  <section class="aviso telefonos portada__telefonos" aria-labelledby="titulo-telefonos">
+    <div class="aviso__cabeza"><strong id="titulo-telefonos">TELÉFONOS ÚTILES</strong></div>
+    <div class="aviso__cuerpo">
+      <div class="linea"><span>Bomberos</span><span class="linea__puntos" aria-hidden="true"></span><a class="linea__dato" href="tel:100">100</a></div>
+      <div class="linea"><span>Policía</span><span class="linea__puntos" aria-hidden="true"></span><a class="linea__dato" href="tel:101">101</a></div>
+      <div class="linea"><span>Emergencias médicas</span><span class="linea__puntos" aria-hidden="true"></span><a class="linea__dato" href="tel:107">107</a></div>
+      <hr class="filete">
+      <p><strong>Olor fuerte a gas:</strong> cerrá la llave de paso, ventilá, no toques interruptores ni prendas fuego, salí y llamá al 100.</p>
+    </div>
+  </section>
+</div>
+{% endblock %}

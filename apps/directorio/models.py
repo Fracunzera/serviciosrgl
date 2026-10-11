@@ -3,6 +3,7 @@ from pathlib import Path
 from zoneinfo import ZoneInfo
 
 from django.db import models
+from django.db.models import Avg, Count, Q
 from django.utils import timezone
 from django.utils.text import slugify
 
@@ -21,6 +22,8 @@ class Rubro(models.Model):
     palabras_clave = models.TextField(
         blank=True, help_text="Separadas por coma. Se usan para detectar el rubro en urgencias."
     )
+    # El "Ver también" de la guía: Plomería ↔ Destapaciones, Gas ↔ Plomería.
+    ver_tambien = models.ManyToManyField("self", blank=True)
     orden = models.PositiveSmallIntegerField(default=0)
 
     class Meta:
@@ -33,6 +36,19 @@ class Rubro(models.Model):
         return [p.strip().lower() for p in self.palabras_clave.split(",") if p.strip()]
 
 
+class OficioQuerySet(models.QuerySet):
+    def publicados(self):
+        """Los que figuran en el directorio: solo aprobados."""
+        return self.filter(estado=Oficio.Estado.APROBADO)
+
+    def con_rating(self):
+        publicadas = Q(resenas__estado="publicada")
+        return self.annotate(
+            rating=Avg("resenas__estrellas", filter=publicadas),
+            cantidad_resenas=Count("resenas", filter=publicadas, distinct=True),
+        )
+
+
 class Oficio(models.Model):
     class Estado(models.TextChoices):
         PENDIENTE = "pendiente", "Pendiente de aprobación"
@@ -41,6 +57,12 @@ class Oficio(models.Model):
 
     city = models.ForeignKey(City, on_delete=models.PROTECT, related_name="oficios")
     nombre = models.CharField(max_length=120)
+    # Como en la guía: apellido primero ("Acosta, Ramón"). Ordena el
+    # listado. Vacío para comercios ("Cerrajería La Llave").
+    nombre_guia = models.CharField(
+        "nombre en la guía", max_length=120, blank=True,
+        help_text='Apellido primero, separado por coma: "Acosta, Ramón". Vacío = se usa el nombre.',
+    )
     slug = models.SlugField(max_length=140, blank=True)
     rubros = models.ManyToManyField(Rubro, related_name="oficios")
     cubre_toda_la_ciudad = models.BooleanField(default=False)
@@ -79,6 +101,8 @@ class Oficio(models.Model):
     creado_at = models.DateTimeField(auto_now_add=True)
     actualizado_at = models.DateTimeField(auto_now=True)
 
+    objects = OficioQuerySet.as_manager()
+
     class Meta:
         ordering = ["nombre"]
         constraints = [
@@ -99,6 +123,12 @@ class Oficio(models.Model):
         while Oficio.objects.filter(city_id=self.city_id, slug=slug).exclude(pk=self.pk).exists():
             slug, n = f"{base}-{n}", n + 1
         return slug
+
+    @property
+    def partes_guia(self):
+        """("Acosta", "Ramón") para "Acosta, Ramón"; (nombre, "") si no hay nombre_guia."""
+        principal, _, resto = (self.nombre_guia or self.nombre).partition(",")
+        return principal.strip(), resto.strip()
 
     @property
     def verificado(self):

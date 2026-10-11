@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% load guia %}
+
+{% block titulo %}{{ oficio.nombre }} · {% for r in oficio.rubros.all %}{{ r.nombre }}{% if not forloop.last %}, {% endif %}{% endfor %} en {{ city.nombre }}{% endblock %}
+{% block descripcion %}{{ oficio.nombre }}: {% for r in oficio.rubros.all %}{{ r.nombre|lower }}{% if not forloop.last %}, {% endif %}{% endfor %} en {{ city.nombre }}. Reseñas de vecinos y datos verificados.{% endblock %}
+
+{% block cabezal %}
+<div class="cabezal">
+  <span>{% for r in oficio.rubros.all %}{{ r.nombre }}{% if not forloop.last %} · {% endif %}{% endfor %}</span>
+  <span class="cabezal__centro">Aviso</span>
+  <span>{{ city.nombre }}</span>
+</div>
+{% endblock %}
+
+{% block contenido %}
+{% with rubros=oficio.rubros.all barrios=oficio.barrios.all fotos=oficio.fotos.all %}
+<p class="migas"><a href="{% url 'core:home' city.slug %}">Índice</a>{% with r=rubros.0 %}{% if r %} › <a href="{% url 'directorio:rubro' city.slug r.slug %}">{{ r.nombre }}</a>{% endif %}{% endwith %} › {{ oficio.nombre }}</p>
+
+{% if suspendido %}
+<p class="aviso-suspendido">Este perfil está suspendido: no figura en la guía y no recibe pedidos. Las reseñas que ya tenía se mantienen publicadas.</p>
+{% endif %}
+
+<div class="ficha">
+  <div>
+    <article class="aviso">
+      <header class="aviso__cabeza">
+        <h1 class="aviso__titulo">{{ oficio.nombre }}</h1>
+        <p class="aviso__bajada">{% for r in rubros %}{{ r.nombre }}{% if not forloop.last %} · {% endif %}{% endfor %}</p>
+      </header>
+      <div class="aviso__cuerpo">
+        <div class="entrada__marcas">
+          {% if oficio.verificado %}<span class="sello sello--grande">✔ Verificado</span>{% endif %}
+          {% if oficio.de_guardia %}<span class="sello sello--negro">Guardia de urgencias</span>{% endif %}
+        </div>
+
+        {% if oficio.descripcion %}<p>{{ oficio.descripcion|linebreaksbr }}</p>{% endif %}
+
+        <dl class="datos">
+          {% if oficio.anios_oficio %}
+          <div><dt>Años de oficio</dt><span class="linea__puntos" aria-hidden="true"></span><dd>{{ oficio.anios_oficio }}</dd></div>
+          {% endif %}
+          <div><dt>Garantía</dt><span class="linea__puntos" aria-hidden="true"></span><dd>{{ oficio.garantia|default:"No ofrece" }}</dd></div>
+          {% if oficio.matricula %}
+          <div><dt>Matrícula</dt><span class="linea__puntos" aria-hidden="true"></span><dd>{{ oficio.matricula }}</dd></div>
+          {% endif %}
+          <div><dt>Zona</dt><span class="linea__puntos" aria-hidden="true"></span><dd>{% if oficio.cubre_toda_la_ciudad %}Toda la ciudad{% else %}{% for b in barrios %}{{ b.nombre }}{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}</dd></div>
+          <div><dt>Reseñas</dt><span class="linea__puntos" aria-hidden="true"></span><dd>{% if oficio.cantidad_resenas %}<span aria-hidden="true">{{ oficio.rating|estrellas }}</span> {{ oficio.rating|floatformat:1 }} ({{ oficio.cantidad_resenas }}){% else %}Todavía no tiene{% endif %}</dd></div>
+        </dl>
+      </div>
+    </article>
+
+    {% if fotos %}
+    <h2 class="seccion-titulo">Trabajos realizados</h2>
+    <div class="galeria">
+      {% for f in fotos %}<a href="{{ f.imagen.url }}"><img src="{{ f.imagen.url }}" alt="{{ f.descripcion|default:'Trabajo de '|add:oficio.nombre }}" loading="lazy"></a>{% endfor %}
+    </div>
+    {% endif %}
+
+    <h2 class="seccion-titulo" id="resenas">Opiniones de vecinos</h2>
+    {% for r in resenas %}
+    <article class="resena">
+      <div class="linea">
+        <strong>{{ r.autor }}</strong>
+        <span class="linea__puntos" aria-hidden="true"></span>
+        <span class="linea__dato estrellas" aria-label="{{ r.estrellas }} de 5 estrellas">{{ r.estrellas|estrellas }}</span>
+      </div>
+      {% if r.texto %}<p>{{ r.texto }}</p>{% endif %}
+      <p class="resena__pie">{{ r.creado_at|date:"F Y" }} · {% if r.pedido %}Pedido hecho por la guía{% if r.pedido.barrio %} en {{ r.pedido.barrio.nombre }}{% endif %}{% else %}Trabajo verificado por la guía{% endif %}</p>
+    </article>
+    {% empty %}
+    <p class="vacio">Todavía no tiene reseñas. Solo pueden opinar los vecinos que le pidieron un trabajo por la guía.</p>
+    {% endfor %}
+  </div>
+
+  <aside>
+    <section class="aviso">
+      <div class="aviso__cabeza"><strong>¿NECESITÁS ESTE SERVICIO?</strong></div>
+      <div class="aviso__cuerpo">
+        <p>Pedí presupuesto por la guía. Tu teléfono se comparte solo con el oficio que elijas.</p>
+        <span class="boton" aria-disabled="true">Pedir presupuesto · próximamente</span>
+      </div>
+    </section>
+    <p class="ver-tambien">Los teléfonos de los oficios no se publican: el contacto se hace por la guía para que cada trabajo quede registrado y se pueda reseñar.</p>
+  </aside>
+</div>
+{% endwith %}
+{% endblock %}

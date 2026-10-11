@@ -1,0 +1,41 @@
+{% load static %}<!doctype html>
+<html lang="es-AR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block titulo %}Servicios RGL · Guía de oficios de Río Gallegos{% endblock %}</title>
+  <meta name="description" content="{% block descripcion %}Guía de oficios de Río Gallegos: plomeros, gasistas, electricistas y cerrajeros verificados, con reseñas de vecinos y guardia de urgencias los fines de semana.{% endblock %}">
+  <meta name="theme-color" content="#f7d82d">
+  <link rel="preload" href="{% static 'fonts/archivo-narrow.woff2' %}" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="{% static 'css/guia.css' %}">
+</head>
+<body>
+<div class="pagina">
+  <header class="cabecera">
+    <hr class="filete-doble">
+    <div class="cabecera__fila">
+      <a class="marca" href="{% if city %}{% url 'core:home' city.slug %}{% else %}/{% endif %}">
+        <span class="marca__nombre">Servicios RGL</span>
+        <span class="marca__bajada">Guía de oficios · {% if city %}{{ city.nombre }}{% else %}Río Gallegos{% endif %}</span>
+      </a>
+      <span class="edicion">Edición {{ EDICION }}</span>
+    </div>
+    <hr class="filete-doble">
+  </header>
+
+  {% block cabezal %}{% endblock %}
+
+  <main>
+    {% block contenido %}{% endblock %}
+  </main>
+
+  <footer class="pie">
+    <hr class="filete-doble">
+    <p class="pie__aviso">La guía conecta vecinos con oficios de la ciudad. No ejecuta los trabajos ni intermedia pagos: el acuerdo y el pago son directos entre el vecino y el oficio.</p>
+    {% if FACEBOOK_GRUPO_URL %}<p><a href="{{ FACEBOOK_GRUPO_URL }}" rel="noopener">Sumate al grupo de vecinos en Facebook</a></p>{% endif %}
+    {% block sponsor %}{% endblock %}
+    <p>Servicios RGL · {% if city %}{{ city.nombre }}{% else %}Río Gallegos{% endif %}, Santa Cruz · Edición {{ EDICION }}</p>
+  </footer>
+</div>
+</body>
+</html>

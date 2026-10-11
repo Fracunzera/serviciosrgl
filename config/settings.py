@@ -6,6 +6,7 @@ Todo lo que cambia entre local y producción viene de variables de entorno
 """
 
 import os
+import sys
 from pathlib import Path
 
 from django.core.exceptions import ImproperlyConfigured
@@ -83,6 +84,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "apps.core.context_processors.guia",
             ],
         },
     },
@@ -138,10 +140,15 @@ MEDIA_URL = "/media/"
 MEDIA_ROOT = DATA_DIR / "media"
 SERVE_MEDIA = env_bool("SERVE_MEDIA", DEBUG)
 
+# El storage con manifest exige collectstatic previo: solo en producción
+# (en la imagen Docker se corre al construir). En desarrollo y tests, simple.
+TESTING = len(sys.argv) > 1 and sys.argv[1] == "test"
 STORAGES = {
     "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
     "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"
+        if DEBUG or TESTING
+        else "whitenoise.storage.CompressedManifestStaticFilesStorage"
     },
 }
 

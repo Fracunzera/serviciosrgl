@@ -10,10 +10,13 @@ python3 -m venv .venv
 .venv/bin/pip install -r requirements.txt
 export DJANGO_DEBUG=1
 .venv/bin/python manage.py migrate
+.venv/bin/python manage.py cargar_demo      # ciudad, barrios, rubros + oficios inventados
 .venv/bin/python manage.py createsuperuser
 .venv/bin/python manage.py runserver        # web
 .venv/bin/python manage.py worker           # en otra terminal
 ```
+
+Tests: `DJANGO_DEBUG=1 .venv/bin/python manage.py test`.
 
 Con `DJANGO_DEBUG=1` los mails salen por consola y Django sirve `/media/`.
 
@@ -23,6 +26,7 @@ Con `DJANGO_DEBUG=1` los mails salen por consola y Django sirve `/media/`.
 cp .env.example .env                 # completar
 mkdir -p data && sudo chown 1000:1000 data
 docker compose up -d --build
+docker compose exec web python manage.py cargar_base   # ciudad, barrios y rubros reales
 docker compose exec web python manage.py createsuperuser
 ```
 

@@ -1,0 +1,577 @@
+/*
+ * Guía de oficios — estética de guía telefónica impresa.
+ * Papel amarillo, una sola tinta negra, grotesca condensada, filetes,
+ * cabezales de rubro invertidos, línea de puntos hasta el dato y avisos
+ * recuadrados. Mobile-first: una columna; dos en pantallas anchas.
+ */
+
+@font-face {
+  font-family: "Archivo Narrow";
+  src: url("../fonts/archivo-narrow.woff2") format("woff2");
+  font-weight: 400 700;
+  font-display: swap;
+}
+
+:root {
+  --papel: #f7d82d;
+  --papel-claro: #fbe679;
+  --tinta: #141210;
+  --tinta-suave: #3a3427;
+  --puntos: rgba(20, 18, 16, 0.55);
+  --ancho: 1080px;
+  --fuente: "Archivo Narrow", "Arial Narrow", "Roboto Condensed", "Helvetica Neue", sans-serif;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background-color: var(--papel);
+  /* Trama de impresión muy sutil: el papel de guía nunca era liso. */
+  background-image: radial-gradient(rgba(20, 18, 16, 0.045) 0.6px, transparent 0.7px);
+  background-size: 3px 3px;
+  color: var(--tinta);
+  font-family: var(--fuente);
+  font-size: 1.0625rem;
+  line-height: 1.35;
+}
+
+a {
+  color: inherit;
+}
+
+a:focus-visible,
+button:focus-visible {
+  outline: 3px solid var(--tinta);
+  outline-offset: 2px;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+.pagina {
+  max-width: var(--ancho);
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+/* ---- Filetes ---------------------------------------------------------- */
+
+.filete-doble {
+  border: 0;
+  border-top: 5px solid var(--tinta);
+  border-bottom: 1px solid var(--tinta);
+  height: 9px;
+  margin: 0;
+}
+
+.filete {
+  border: 0;
+  border-top: 1px solid var(--tinta);
+  margin: 0.75rem 0;
+}
+
+/* ---- Cabecera (portada de la guía) ------------------------------------ */
+
+.cabecera {
+  padding-top: 14px;
+}
+
+.cabecera__fila {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.25rem 1rem;
+  padding: 0.5rem 0 0.35rem;
+}
+
+.marca {
+  text-decoration: none;
+  line-height: 0.9;
+}
+
+.marca__nombre {
+  display: block;
+  font-size: clamp(2.4rem, 9vw, 4.2rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+}
+
+.marca__bajada {
+  display: block;
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  margin-top: 0.3rem;
+}
+
+.edicion {
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border: 2px solid var(--tinta);
+  padding: 0.1rem 0.45rem;
+  white-space: nowrap;
+}
+
+/* Cabezal de página: "ACOSTA — ZÁRATE        PLOMERÍA        Pág. 14" */
+.cabezal {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border-bottom: 2px solid var(--tinta);
+  padding: 0.35rem 0 0.25rem;
+  margin-bottom: 1rem;
+}
+
+.cabezal__centro {
+  display: none;
+}
+
+@media (min-width: 640px) {
+  .cabezal__centro {
+    display: inline;
+  }
+}
+
+.migas {
+  font-size: 0.85rem;
+  margin: 0 0 0.6rem;
+}
+
+.migas a {
+  font-weight: 700;
+}
+
+/* ---- Cabezal de rubro (invertido, como en la guía) -------------------- */
+
+.rubro-titulo {
+  background: var(--tinta);
+  color: var(--papel);
+  font-size: clamp(1.5rem, 6vw, 2.1rem);
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  line-height: 1.1;
+  text-transform: uppercase;
+  padding: 0.3rem 0.6rem 0.25rem;
+  margin: 0 0 0.4rem;
+}
+
+.ver-tambien {
+  font-size: 0.95rem;
+  font-style: italic;
+  margin: 0 0 1rem;
+}
+
+.ver-tambien a {
+  font-style: normal;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+/* ---- Listado en columnas ---------------------------------------------- */
+
+.columnas {
+  column-count: 1;
+}
+
+@media (min-width: 760px) {
+  .columnas {
+    column-count: 2;
+    column-gap: 2.2rem;
+    column-rule: 1px solid var(--tinta);
+  }
+}
+
+.entrada {
+  break-inside: avoid;
+  border-bottom: 1px dotted var(--puntos);
+  padding: 0.55rem 0;
+}
+
+.entrada > a {
+  display: block;
+  text-decoration: none;
+}
+
+.entrada > a:hover .entrada__nombre,
+.entrada > a:focus-visible .entrada__nombre {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+}
+
+/* Nombre ............................................ dato */
+.linea {
+  display: flex;
+  align-items: baseline;
+  gap: 0.3rem;
+}
+
+.linea__puntos {
+  flex: 1 1 1.5rem;
+  min-width: 1.5rem;
+  border-bottom: 2px dotted var(--tinta);
+  transform: translateY(-0.28em);
+}
+
+.linea__dato {
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.entrada__nombre {
+  font-size: 1.15rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+}
+
+.entrada__resto {
+  font-size: 1.05rem;
+  font-weight: 500;
+}
+
+.entrada__detalle {
+  color: var(--tinta-suave);
+  font-size: 0.95rem;
+  margin: 0.1rem 0 0;
+}
+
+.entrada__marcas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.3rem;
+}
+
+.vacio {
+  font-style: italic;
+  padding: 1rem 0;
+}
+
+/* ---- Sellos ----------------------------------------------------------- */
+
+.sello {
+  display: inline-block;
+  border: 2px solid var(--tinta);
+  padding: 0 0.35rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  line-height: 1.5;
+  text-transform: uppercase;
+}
+
+.sello--negro {
+  background: var(--tinta);
+  color: var(--papel);
+}
+
+.sello--grande {
+  font-size: 1rem;
+  border-width: 3px;
+  padding: 0.1rem 0.5rem;
+  transform: rotate(-3deg);
+}
+
+.estrellas {
+  letter-spacing: 0.05em;
+}
+
+/* ---- Avisos recuadrados ----------------------------------------------- */
+
+.aviso {
+  border: 3px solid var(--tinta);
+  background: var(--papel-claro);
+  margin: 0 0 1.25rem;
+}
+
+.aviso__cabeza {
+  background: var(--tinta);
+  color: var(--papel);
+  padding: 0.5rem 0.75rem;
+}
+
+.aviso__cuerpo {
+  padding: 0.75rem;
+}
+
+.aviso--negro {
+  background: var(--tinta);
+  color: var(--papel);
+}
+
+.aviso__titulo {
+  font-size: clamp(1.9rem, 8vw, 3rem);
+  font-weight: 700;
+  line-height: 0.95;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+.aviso__bajada {
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin: 0.35rem 0 0;
+}
+
+/* Ficha: "Años de oficio .................... 15" */
+.datos {
+  margin: 0;
+}
+
+.datos div {
+  display: flex;
+  align-items: baseline;
+  gap: 0.3rem;
+  padding: 0.2rem 0;
+}
+
+.datos dt {
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.datos dd {
+  margin: 0;
+  text-align: right;
+  font-weight: 600;
+}
+
+.datos .linea__puntos {
+  border-bottom-width: 1px;
+}
+
+.ficha {
+  display: grid;
+  gap: 1.25rem;
+}
+
+@media (min-width: 860px) {
+  .ficha {
+    grid-template-columns: 1fr 320px;
+    align-items: start;
+  }
+}
+
+.galeria {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 0.5rem;
+}
+
+.galeria img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border: 2px solid var(--tinta);
+  /* Fotos en "tinta" de guía; color al pasar o tocar. */
+  filter: grayscale(1) contrast(1.1);
+}
+
+.galeria img:hover {
+  filter: none;
+}
+
+.seccion-titulo {
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border-top: 5px solid var(--tinta);
+  border-bottom: 1px solid var(--tinta);
+  padding: 0.35rem 0 0.25rem;
+  margin: 1.5rem 0 0.75rem;
+}
+
+.resena {
+  border-bottom: 1px dotted var(--puntos);
+  padding: 0.6rem 0;
+}
+
+.resena p {
+  margin: 0.25rem 0;
+}
+
+.resena__pie {
+  font-size: 0.85rem;
+  color: var(--tinta-suave);
+}
+
+.aviso-suspendido {
+  border: 3px double var(--tinta);
+  padding: 0.6rem 0.75rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+/* ---- Botones ---------------------------------------------------------- */
+
+.boton {
+  display: inline-block;
+  background: var(--tinta);
+  color: var(--papel);
+  border: 3px solid var(--tinta);
+  font: inherit;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-decoration: none;
+  padding: 0.55rem 0.9rem;
+  cursor: pointer;
+}
+
+.boton--claro {
+  background: var(--papel);
+  color: var(--tinta);
+}
+
+.boton[aria-disabled="true"] {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* ---- Home: índice alfabético ------------------------------------------ */
+
+.portada {
+  display: grid;
+  gap: 1.25rem;
+}
+
+@media (min-width: 860px) {
+  .portada {
+    grid-template-columns: 1fr 340px;
+    grid-template-rows: auto auto 1fr;
+    grid-template-areas:
+      "indice urgencias"
+      "indice telefonos"
+      "indice .";
+    column-gap: 1.25rem;
+    row-gap: 0;
+    align-items: start;
+  }
+  .portada__indice { grid-area: indice; }
+  .portada__urgencias { grid-area: urgencias; }
+  .portada__telefonos { grid-area: telefonos; }
+}
+
+/* Las pestañas de letras del canto de la guía. */
+.pestanas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 0 0 1rem;
+  padding: 0;
+  list-style: none;
+}
+
+.pestanas a {
+  display: block;
+  min-width: 2.1rem;
+  text-align: center;
+  background: var(--tinta);
+  color: var(--papel);
+  font-weight: 700;
+  text-decoration: none;
+  padding: 0.25rem 0.4rem;
+}
+
+.letra {
+  break-inside: avoid;
+  margin-bottom: 0.9rem;
+}
+
+.letra__marca {
+  display: inline-block;
+  background: var(--tinta);
+  color: var(--papel);
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 1;
+  padding: 0.15rem 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.letra ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.letra li a {
+  text-decoration: none;
+  padding: 0.3rem 0;
+}
+
+.letra li a:hover .entrada__nombre {
+  text-decoration: underline;
+}
+
+.urgencias h2 {
+  font-size: clamp(1.6rem, 7vw, 2.2rem);
+  line-height: 0.95;
+  text-transform: uppercase;
+  margin: 0 0 0.4rem;
+}
+
+.urgencias ul {
+  margin: 0.5rem 0 0.75rem;
+  padding-left: 1.1rem;
+}
+
+.telefonos .linea {
+  padding: 0.2rem 0;
+}
+
+.telefonos .linea__puntos {
+  border-bottom-width: 1px;
+}
+
+/* ---- Pie -------------------------------------------------------------- */
+
+.pie {
+  margin-top: 2.5rem;
+  padding-bottom: 2rem;
+  font-size: 0.85rem;
+}
+
+.pie p {
+  margin: 0.5rem 0;
+}
+
+.pie__aviso {
+  max-width: 60ch;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}

@@ -1,7 +1,7 @@
 from datetime import datetime, time, timedelta, timezone as dt_tz
 from zoneinfo import ZoneInfo
 
-from django.test import TestCase
+from django.test import TestCase, override_settings
 
 from apps.core.models import City
 from apps.directorio.models import Consentimiento, FranjaGuardia, Oficio
@@ -90,3 +90,46 @@ class OficioTests(TestCase):
         Consentimiento.registrar(self.oficio, tipo, False, "texto v1")
         self.assertFalse(Oficio.objects.get(pk=self.oficio.pk).telefono_en_fallback)
         self.assertEqual(self.oficio.consentimientos.count(), 2)
+
+
+class VistasTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        from django.core.management import call_command
+        from io import StringIO
+
+        with override_settings(DEBUG=True):
+            call_command("cargar_demo", stdout=StringIO())
+
+    def test_raiz_redirige_a_la_ciudad(self):
+        self.assertRedirects(self.client.get("/"), "/rio-gallegos/")
+
+    def test_ciudad_inexistente_404(self):
+        self.assertEqual(self.client.get("/caleta-olivia/").status_code, 404)
+
+    def test_home_lista_rubros(self):
+        r = self.client.get("/rio-gallegos/")
+        self.assertContains(r, "Plomería")
+        self.assertContains(r, "Teléfonos útiles".upper())
+
+    def test_rubro_solo_aprobados_y_por_apellido(self):
+        r = self.client.get("/rio-gallegos/rubro/plomeria/")
+        nombres = [o.nombre for o in r.context["oficios"]]
+        self.assertEqual(nombres, ["Ramón Acosta", "Hugo Bustos", "Gabriela Cárdenas"])
+        self.assertNotContains(r, "Suspendido")
+        self.assertNotContains(r, "2966")  # el teléfono nunca se publica
+
+    def test_ficha_con_resenas(self):
+        r = self.client.get("/rio-gallegos/oficio/ramon-acosta/")
+        self.assertContains(r, "Marcela, B° Belgrano")
+        self.assertContains(r, "Verificado")
+        self.assertNotContains(r, "2966")
+
+    def test_ficha_pendiente_404_suspendida_visible(self):
+        self.assertEqual(self.client.get("/rio-gallegos/oficio/electricista-pendiente/").status_code, 404)
+        r = self.client.get("/rio-gallegos/oficio/plomero-suspendido/")
+        self.assertContains(r, "Este perfil está suspendido")
+        self.assertNotContains(r, "no se presentó")  # el motivo no es público
+
+    def test_rubro_vacio(self):
+        self.assertContains(self.client.get("/rio-gallegos/rubro/vidrieria/"), "Todavía no hay oficios")

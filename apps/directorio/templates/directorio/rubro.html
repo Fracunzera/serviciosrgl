@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block titulo %}{{ rubro.nombre }} en {{ city.nombre }} · Servicios RGL{% endblock %}
+{% block descripcion %}{{ rubro.nombre }} en {{ city.nombre }}: oficios verificados con reseñas de vecinos.{% endblock %}
+
+{% block cabezal %}
+<div class="cabezal">
+  {# Palabras guía: primer y último apellido de la página. #}
+  <span>{% if oficios %}{% with primero=oficios.0.partes_guia ultimo=oficios|last %}{{ primero.0 }}{% if oficios|length > 1 %} — {{ ultimo.partes_guia.0 }}{% endif %}{% endwith %}{% else %}{{ rubro.nombre }}{% endif %}</span>
+  <span class="cabezal__centro">{{ rubro.nombre }}</span>
+  <span>Pág. {{ pagina|add:1 }}</span>
+</div>
+{% endblock %}
+
+{% block contenido %}
+<p class="migas"><a href="{% url 'core:home' city.slug %}">Índice</a> › {{ rubro.nombre }}</p>
+
+<h1 class="rubro-titulo">{{ rubro.nombre }}</h1>
+{% if ver_tambien %}
+<p class="ver-tambien">Ver también: {% for r in ver_tambien %}<a href="{% url 'directorio:rubro' city.slug r.slug %}">{{ r.nombre }}</a>{% if not forloop.last %} · {% endif %}{% endfor %}</p>
+{% endif %}
+{% if rubro.requiere_matricula %}
+<p class="ver-tambien">En este rubro la guía controla la matrícula de cada oficio.</p>
+{% endif %}
+
+{% if oficios %}
+<div class="columnas">
+  {% for o in oficios %}{% include "directorio/_entrada.html" %}{% endfor %}
+</div>
+{% else %}
+<p class="vacio">Todavía no hay oficios de {{ rubro.nombre|lower }} en la guía. ¿Conocés a alguien bueno? Pronto vas a poder recomendarlo.</p>
+{% endif %}
+{% endblock %}

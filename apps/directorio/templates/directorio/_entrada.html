@@ -1,0 +1,25 @@
+{% with barrios=o.barrios.all partes=o.partes_guia %}
+<article class="entrada">
+  <a href="{% url 'directorio:oficio' city.slug o.slug %}">
+    <div class="linea">
+      <span><span class="entrada__nombre">{{ partes.0 }}</span>{% if partes.1 %} <span class="entrada__resto">{{ partes.1 }}</span>{% endif %}</span>
+      <span class="linea__puntos" aria-hidden="true"></span>
+      {% if o.cantidad_resenas %}
+      <span class="linea__dato"><span aria-hidden="true">★ {{ o.rating|floatformat:1 }} ({{ o.cantidad_resenas }})</span><span class="sr-only">{{ o.rating|floatformat:1 }} de 5 estrellas, {{ o.cantidad_resenas }} reseña{{ o.cantidad_resenas|pluralize }}</span></span>
+      {% else %}
+      <span class="linea__dato">Sin reseñas</span>
+      {% endif %}
+    </div>
+    <p class="entrada__detalle">{% for r in o.rubros.all %}{{ r.nombre }}{% if not forloop.last %} · {% endif %}{% endfor %}</p>
+    <p class="entrada__detalle">Cubre: {% if o.cubre_toda_la_ciudad %}toda la ciudad{% else %}{% for b in barrios|slice:":4" %}{{ b.nombre }}{% if not forloop.last %}, {% endif %}{% endfor %}{% if barrios|length > 4 %} y {{ barrios|length|add:"-4" }} más{% endif %}{% endif %}</p>
+    {% if o.anios_oficio or o.garantia %}
+    <p class="entrada__detalle">{% if o.anios_oficio %}{{ o.anios_oficio }} años de oficio{% endif %}{% if o.anios_oficio and o.garantia %} · {% endif %}{% if o.garantia %}Garantía: {{ o.garantia }}{% endif %}</p>
+    {% endif %}
+    <div class="entrada__marcas">
+      {% if o.verificado %}<span class="sello">✔ Verificado</span>{% endif %}
+      {% if o.matricula %}<span class="sello">Mat. {{ o.matricula }}</span>{% endif %}
+      {% if o.de_guardia and rubro.en_urgencias %}<span class="sello sello--negro">Guardia de urgencias</span>{% endif %}
+    </div>
+  </a>
+</article>
+{% endwith %}
