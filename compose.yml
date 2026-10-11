@@ -1,0 +1,36 @@
+# Una imagen, dos procesos. Ambos montan ./data (base SQLite + media).
+# ./data tiene que ser un disco local del host: NFS/SMB rompen el locking de WAL.
+
+services:
+  web:
+    build: .
+    image: serviciosrgl:latest
+    env_file: .env
+    # Solo web migra, así el worker nunca corre contra un esquema viejo.
+    command: >
+      sh -c "python manage.py migrate --noinput &&
+             exec gunicorn config.wsgi --bind 0.0.0.0:8000 --workers 2 --access-logfile -"
+    volumes:
+      - ./data:/app/data
+    ports:
+      # Solo localhost: delante va tu reverse proxy (TLS + /media/).
+      - "127.0.0.1:8000:8000"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/healthz')"]
+      interval: 30s
+      timeout: 5s
+      start_period: 20s
+
+  worker:
+    image: serviciosrgl:latest
+    pull_policy: never
+    env_file: .env
+    command: python manage.py worker
+    volumes:
+      - ./data:/app/data
+    depends_on:
+      web:
+        condition: service_healthy
+    restart: unless-stopped
+    stop_grace_period: 10s
