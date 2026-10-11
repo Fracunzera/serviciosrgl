@@ -69,6 +69,38 @@ serviciosrgl/
 - **Urgencia:** se arma una cola de oficios de guardia ordenada por `ultima_asignacion` ascendente, salteando a los no disponibles. Si el primero no acepta en `URGENCIA_MINUTOS_PARA_ACEPTAR`, el worker escala al siguiente. Cuando se termina la cola, entra el fallback: lista de oficios con consentimiento y teléfono visible, más un aviso al admin.
 - **La disponibilidad ("no disponible hasta…") también se maneja por link firmado.** Los oficios no tienen login.
 
+## Modelo de datos
+
+```
+core        City ─┬─< Barrio
+                  │
+directorio        ├─< Oficio >──< Rubro          (N:N rubros)
+                  │     ├──< Barrio               (N:N barrios, o cubre_toda_la_ciudad)
+                  │     ├─< FranjaGuardia         (día + desde/hasta, semanal)
+                  │     ├─< FotoTrabajo
+                  │     └─< Consentimiento        (append-only, Ley 25.326)
+pedidos           ├─< Pedido ─< Derivacion >─ Oficio   (una por pedido×oficio)
+                  │     └─< FotoPedido
+resenas           │   Pedido ─ Resena >─ Oficio  (1:1 con pedido, o bootstrap)
+                  │   Pedido ─< Reclamo
+                  └─< Reporte                     (recomendación / advertencia)
+```
+
+- **Verificado** = `estado=aprobado` + `dni_verificado_at`. No se guarda el número de DNI (minimización de datos). La matrícula se exige al aprobar si algún rubro tiene `requiere_matricula`. Esa regla se valida en el admin, porque es M2M y el modelo no la puede chequear al guardar.
+- **Franjas de guardia:**
+  - Si `hasta < desde`, la franja cruza la medianoche.
+  - Si `desde == hasta`, cubre el día completo.
+  - Se evalúan en `City.timezone`.
+- **`Derivacion`** es el `IntentoNotificacion` del spec más la respuesta del oficio (mensaje y monto en presupuesto). El link firmado lleva `derivacion_id` + `Oficio.version_links`. No se guarda token: subir la versión invalida todos los links de ese oficio.
+- **La cola de urgencia no se guarda.** En cada escalado se elige al próximo elegible que todavía no tenga derivación en ese pedido. Así, si alguien se marca no disponible a mitad de camino, la cola lo respeta.
+- **Pedido:**
+  - **Contacto y aviso al vecino.** El mail es obligatorio en presupuesto y opcional en urgencia. `token` es un token aleatorio guardado, no firmado: tiene que durar meses (por la reseña) y sobrevivir a una rotación de `SECRET_KEY`.
+  - **Completado.** Lo confirma el vecino. Si no lo hace, el worker lo completa a las `PEDIDO_HORAS_AUTOCOMPLETAR` (24 h) de asignado y registra quién lo completó en `completado_por`.
+- **Reseña:**
+  - Una por pedido, solo si el pedido está completado y es del oficio asignado.
+  - Sin pedido, únicamente si es de bootstrap (lo asegura una constraint en la base).
+  - Se publica al instante y el admin puede ocultarla (moderación posterior).
+
 ## Monetización (no se construye, solo no se bloquea)
 
 - `base.html` tiene un bloque de footer reservado para sponsor o Cafecito, que se prende con un setting.

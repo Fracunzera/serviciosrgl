@@ -93,6 +93,7 @@ TEMPLATES = [
 # web y worker: WAL necesita los archivos -wal y -shm al lado de la base, por
 # eso se monta la carpeta y no el archivo suelto.
 DATA_DIR = Path(env("DATA_DIR", BASE_DIR / "data"))
+DATA_DIR.mkdir(parents=True, exist_ok=True)  # SQLite no crea directorios
 
 DATABASES = {
     "default": {
@@ -177,6 +178,9 @@ DEFAULT_CITY_SLUG = "rio-gallegos"
 NOTIFICADORES = env_list("NOTIFICADORES", "email,semimanual")
 # Minutos que tiene un oficio de guardia para aceptar antes de escalar.
 URGENCIA_MINUTOS_PARA_ACEPTAR = int(env("URGENCIA_MINUTOS_PARA_ACEPTAR", "10"))
+# Si el vecino no confirma que se hizo el trabajo, se completa solo
+# (y queda habilitada la reseña) a las N horas de asignado.
+PEDIDO_HORAS_AUTOCOMPLETAR = int(env("PEDIDO_HORAS_AUTOCOMPLETAR", "24"))
 # Cada cuántos segundos el worker revisa pedidos vencidos.
 WORKER_INTERVALO_SEGUNDOS = int(env("WORKER_INTERVALO_SEGUNDOS", "30"))
 FACEBOOK_GRUPO_URL = env("FACEBOOK_GRUPO_URL", "")
