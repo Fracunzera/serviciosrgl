@@ -9,9 +9,12 @@ Notificador. Dos mitades:
 
 Qué avisos le llegan a un oficio lo decide settings.NOTIFICADORES:
 - "email": el aviso va al mail del oficio.
+- "telegram": si el oficio vinculó su Telegram, el aviso llega al bot con
+  un botón que abre el link firmado.
 - "semimanual": copia al admin con un link wa.me listo para reenviarle.
-Sumar Telegram = un sender "telegram" + una política que encole a
-oficio.telegram_chat_id. El ruteo no cambia.
+  Solo para oficios sin Telegram: con Telegram no hace falta reenviar.
+Sumar otro canal (WhatsApp Cloud API) = un sender + una política acá. El
+ruteo no cambia.
 """
 
 import logging
@@ -22,6 +25,7 @@ from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.utils import timezone
 
+from . import telegram
 from .links import link_derivacion, link_disponibilidad
 from .models import Mensaje
 from .whatsapp import link_wa
@@ -38,17 +42,18 @@ def _render(plantilla, contexto):
     return asunto.strip(), cuerpo.strip() + "\n"
 
 
-def _encolar(destino, asunto, texto, canal="email", **refs):
-    return Mensaje.objects.create(canal=canal, destino=destino, asunto=asunto, texto=texto, **refs)
+def _encolar(destino, asunto, texto, canal="email", link="", **refs):
+    return Mensaje.objects.create(canal=canal, destino=destino, asunto=asunto, texto=texto, link=link, **refs)
 
 
 def avisar_oficio(derivacion, plantilla):
     oficio, pedido = derivacion.oficio, derivacion.pedido
+    link = link_derivacion(derivacion)
     contexto = {
         "oficio": oficio,
         "pedido": pedido,
         "derivacion": derivacion,
-        "link": link_derivacion(derivacion),
+        "link": link,
         "link_disponibilidad": link_disponibilidad(oficio),
         "minutos": settings.URGENCIA_MINUTOS_PARA_ACEPTAR,
     }
@@ -57,7 +62,12 @@ def avisar_oficio(derivacion, plantilla):
     if "email" in settings.NOTIFICADORES and oficio.email:
         _encolar(oficio.email, asunto, texto, derivacion=derivacion, pedido=pedido)
         canales.append("email")
-    if "semimanual" in settings.NOTIFICADORES and settings.ADMIN_EMAIL:
+    con_telegram = "telegram" in settings.NOTIFICADORES and telegram.activo() and oficio.telegram_chat_id
+    if con_telegram:
+        _encolar(oficio.telegram_chat_id, asunto, texto, canal="telegram", link=link,
+                 derivacion=derivacion, pedido=pedido)
+        canales.append("telegram")
+    if "semimanual" in settings.NOTIFICADORES and settings.ADMIN_EMAIL and not con_telegram:
         wa = link_wa(oficio.telefono, f"{asunto}\n\n{texto}", pedido.city.codigo_area)
         _, texto_admin = _render("admin_reenviar", {**contexto, "asunto": asunto, "texto": texto, "wa": wa})
         _encolar(settings.ADMIN_EMAIL, f"[Reenviar a {oficio.nombre}] {asunto}", texto_admin,
@@ -77,6 +87,7 @@ def avisar_oficio_general(oficio, plantilla, **extra):
     contexto = {
         "oficio": oficio,
         "link_disponibilidad": link_disponibilidad(oficio),
+        "link_telegram": telegram.link_vinculacion(oficio),
         "link_ficha": settings.SITE_URL + reverse("directorio:oficio", args=[oficio.city.slug, oficio.slug]),
         **extra,
     }
@@ -115,7 +126,7 @@ def _enviar_email(m):
     send_mail(m.asunto, m.texto, settings.DEFAULT_FROM_EMAIL, [m.destino])
 
 
-SENDERS = {"email": _enviar_email}
+SENDERS = {"email": _enviar_email, "telegram": telegram.enviar}
 
 
 def enviar_pendientes(limite=50):
@@ -136,7 +147,7 @@ def enviar_pendientes(limite=50):
         except Exception as e:  # noqa: BLE001 — cualquier falla se reintenta
             m.intentos += 1
             m.ultimo_error = f"{type(e).__name__}: {e}"
-            if m.intentos >= MAX_INTENTOS:
+            if m.intentos >= MAX_INTENTOS or getattr(e, "definitivo", False):
                 m.estado = Mensaje.Estado.FALLIDO
                 log.error("Mensaje %s falló definitivamente: %s", m.pk, m.ultimo_error)
             else:

@@ -6,4 +6,7 @@ Tu perfil está activo otra vez y vuelve a recibir pedidos:
 
 Tus links anteriores ya no sirven. Este es tu nuevo link de disponibilidad:
 {{ link_disponibilidad }}
-{% endautoescape %}
+{% if link_telegram %}
+¿Preferís recibir los avisos por Telegram? Es más rápido que el mail. Abrí este link desde el celular y tocá «Iniciar»:
+{{ link_telegram }}
+{% endif %}{% endautoescape %}

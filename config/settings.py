@@ -182,7 +182,10 @@ ADMINS = [("Admin", ADMIN_EMAIL)] if ADMIN_EMAIL else []
 DEFAULT_CITY_SLUG = "rio-gallegos"
 # Backends del notificador, en orden. Se agregan "telegram" / "whatsapp" sin
 # tocar el ruteo.
-NOTIFICADORES = env_list("NOTIFICADORES", "email,semimanual")
+NOTIFICADORES = env_list("NOTIFICADORES", "email,semimanual,telegram")
+# Bot de Telegram (BotFather). Vacío = Telegram apagado.
+TELEGRAM_BOT_TOKEN = env("TELEGRAM_BOT_TOKEN", "")
+TELEGRAM_BOT_USERNAME = env("TELEGRAM_BOT_USERNAME", "").lstrip("@")
 # Minutos que tiene un oficio de guardia para aceptar antes de escalar.
 URGENCIA_MINUTOS_PARA_ACEPTAR = int(env("URGENCIA_MINUTOS_PARA_ACEPTAR", "10"))
 # Si el vecino no confirma que se hizo el trabajo, se completa solo

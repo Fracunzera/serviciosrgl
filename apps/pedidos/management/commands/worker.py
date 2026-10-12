@@ -15,7 +15,7 @@ from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.db import close_old_connections
 
-from apps.pedidos import notificaciones, privacidad, ruteo
+from apps.pedidos import notificaciones, privacidad, ruteo, telegram
 
 log = logging.getLogger(__name__)
 
@@ -57,6 +57,11 @@ class Command(BaseCommand):
         completados = ruteo.autocompletar()
         cerrados = ruteo.cerrar_viejos()
         privacidad.anonimizar_viejos()
+        try:
+            # Aparte: si Telegram no responde, igual tienen que salir los mails.
+            telegram.procesar_actualizaciones()
+        except Exception:
+            log.exception("error leyendo Telegram")
         enviados = notificaciones.enviar_pendientes()
         if escaladas or completados or cerrados or enviados:
             log.info(

@@ -19,5 +19,16 @@
   {% include "_campo.html" with campo=form.hasta %}
   <div class="acciones"><button class="boton" name="accion" value="ausente">Marcarme no disponible</button></div>
 </form>
+{% if link_telegram %}
+<h2 class="seccion-titulo">Avisos por Telegram</h2>
+{% if oficio.telegram_chat_id %}
+<p class="esperando">✔ Tu Telegram está vinculado: los pedidos y urgencias te llegan ahí y por mail.</p>
+<div class="acciones"><form method="post">{% csrf_token %}<button class="boton boton--claro boton--chico" name="accion" value="desvincular_telegram">Desvincular Telegram</button></form></div>
+{% else %}
+<p>Recibí los avisos al instante en Telegram, con un botón para responder. Abrí este link desde el celular y tocá «Iniciar»:</p>
+<div class="acciones"><a class="boton" href="{{ link_telegram }}" rel="noopener">Vincular Telegram</a></div>
+{% endif %}
+{% endif %}
+
 <p class="campo__ayuda">Este link es personal: no lo reenvíes. Si cambiaron tus horarios de guardia, escribile al administrador de la guía.</p>
 {% endblock %}

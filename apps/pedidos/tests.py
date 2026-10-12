@@ -391,3 +391,118 @@ class FormulariosTests(Base):
             with Image.open(guardada.imagen.path) as im2:
                 self.assertEqual(max(im2.size), 1600)
                 self.assertEqual(len(im2.getexif()), 0)
+
+
+@override_settings(TELEGRAM_BOT_TOKEN="123:abc", TELEGRAM_BOT_USERNAME="guia_rgl_bot",
+                   ADMIN_EMAIL="admin@guia.test", NOTIFICADORES=["email", "semimanual", "telegram"])
+class TelegramTests(Base):
+    def setUp(self):
+        from . import telegram
+        self.tg = telegram
+        telegram._offset = None
+        self.llamadas = []
+
+    def api(self, updates=()):
+        """Mock de la API: getUpdates devuelve `updates`; el resto se registra."""
+        def llamar(metodo, **params):
+            self.llamadas.append((metodo, params))
+            return list(updates) if metodo == "getUpdates" else {}
+        return mock.patch.object(self.tg, "llamar", side_effect=llamar)
+
+    def enviados(self):
+        return [p for m, p in self.llamadas if m == "sendMessage"]
+
+    def test_token_de_vinculacion(self):
+        o = self.oficio("A")
+        token = self.tg.token_vinculacion(o)
+        self.assertLessEqual(len(token), 64)
+        self.assertEqual(self.tg.oficio_por_token(token), o)
+        self.assertIsNone(self.tg.oficio_por_token(token[:-1] + "0"))
+        self.assertIsNone(self.tg.oficio_por_token("basura"))
+        Oficio.objects.filter(pk=o.pk).update(version_links=2)  # revocar links
+        self.assertIsNone(self.tg.oficio_por_token(token))
+        self.assertTrue(self.tg.link_vinculacion(o).startswith("https://t.me/guia_rgl_bot?start="))
+
+    def test_start_vincula_y_otros_mensajes_reciben_ayuda(self):
+        o = self.oficio("A")
+        updates = [
+            {"update_id": 10, "message": {"chat": {"id": 555}, "text": f"/start {self.tg.token_vinculacion(o)}"}},
+            {"update_id": 11, "message": {"chat": {"id": 777}, "text": "/start trucho-1-xxx"}},
+            {"update_id": 12, "message": {"chat": {"id": 888}, "text": "hola"}},
+        ]
+        with self.api(updates):
+            self.assertEqual(self.tg.procesar_actualizaciones(), 3)
+        o.refresh_from_db()
+        self.assertEqual(o.telegram_chat_id, "555")
+        respuestas = {p["chat_id"]: p["text"] for p in self.enviados()}
+        self.assertIn("¡Listo", respuestas[555])
+        self.assertIn("no es válido", respuestas[777])
+        self.assertIn("link de Telegram que te mandamos", respuestas[888])
+        # La próxima lectura confirma lo procesado.
+        with self.api([]):
+            self.tg.procesar_actualizaciones()
+        self.assertEqual(self.llamadas[-1], ("getUpdates", {"timeout": 0, "allowed_updates": ["message"], "offset": 13}))
+
+    def test_con_telegram_no_hay_copia_semimanual(self):
+        con = self.oficio("Con Telegram", telegram_chat_id="555")
+        sin = self.oficio("Sin Telegram", barrios=[self.centro])
+        p = self.pedido()
+        ruteo.derivar_presupuesto(p)
+        tg = Mensaje.objects.get(canal="telegram")
+        self.assertEqual(tg.destino, "555")
+        self.assertIn("/p/", tg.link)
+        self.assertEqual(p.derivaciones.get(oficio=con).canales, "email,telegram")
+        self.assertEqual(p.derivaciones.get(oficio=sin).canales, "email,semimanual")
+        self.assertEqual(Mensaje.objects.filter(destino="admin@guia.test").count(), 1)  # solo el de "sin"
+
+    def test_envio_con_boton(self):
+        Mensaje.objects.create(canal="telegram", destino="555", asunto="URGENCIA", texto="Pierde", link="https://x/p/abc/")
+        with self.api():
+            self.assertEqual(notificaciones.enviar_pendientes(), 1)
+        (params,) = self.enviados()
+        self.assertEqual(params["reply_markup"]["inline_keyboard"][0][0]["url"], "https://x/p/abc/")
+        self.assertTrue(params["text"].startswith("URGENCIA\n\nPierde"))
+
+    def test_bot_bloqueado_desvincula_y_no_reintenta(self):
+        o = self.oficio("A", telegram_chat_id="555")
+        m = Mensaje.objects.create(canal="telegram", destino="555", asunto="a", texto="b")
+        error = self.tg.ErrorTelegram("Forbidden: bot was blocked by the user", 403)
+        with mock.patch.object(self.tg, "llamar", side_effect=error):
+            notificaciones.enviar_pendientes()
+        m.refresh_from_db()
+        o.refresh_from_db()
+        self.assertEqual((m.estado, m.intentos), (Mensaje.Estado.FALLIDO, 1))
+        self.assertEqual(o.telegram_chat_id, "")
+
+    def test_pagina_de_disponibilidad(self):
+        o = self.oficio("A")
+        url = reverse("pedidos:disponibilidad", args=[links.link_disponibilidad(o).rstrip("/").rsplit("/", 1)[1]])
+        self.assertContains(self.client.get(url), "Vincular Telegram")
+        Oficio.objects.filter(pk=o.pk).update(telegram_chat_id="555")
+        self.assertContains(self.client.get(url), "Tu Telegram está vinculado")
+        self.client.post(url, {"accion": "desvincular_telegram"})
+        o.refresh_from_db()
+        self.assertEqual(o.telegram_chat_id, "")
+
+    def test_telegram_caido_no_frena_los_mails(self):
+        Mensaje.objects.create(destino="a@x.test", asunto="Hola", texto="x")
+        with mock.patch.object(self.tg, "llamar", side_effect=OSError("sin red")):
+            call_command("worker", "--una-vez", stdout=StringIO(), stderr=StringIO())
+        self.assertEqual(Mensaje.objects.get().estado, Mensaje.Estado.ENVIADO)
+
+    def test_error_http_de_la_api(self):
+        import urllib.error
+
+        cuerpo = BytesIO(b'{"ok": false, "error_code": 403, "description": "Forbidden: bot was blocked by the user"}')
+        error = urllib.error.HTTPError("https://api.telegram.org/x", 403, "Forbidden", {}, cuerpo)
+        with mock.patch("urllib.request.urlopen", side_effect=error):
+            with self.assertRaises(self.tg.ErrorTelegram) as ctx:
+                self.tg.llamar("sendMessage", chat_id=1, text="x")
+        self.assertEqual((ctx.exception.codigo, ctx.exception.definitivo), (403, True))
+
+    @override_settings(TELEGRAM_BOT_TOKEN="")
+    def test_apagado_sin_token(self):
+        o = self.oficio("A", telegram_chat_id="555")
+        self.assertEqual(self.tg.link_vinculacion(o), "")
+        ruteo.derivar_presupuesto(self.pedido())
+        self.assertFalse(Mensaje.objects.filter(canal="telegram").exists())

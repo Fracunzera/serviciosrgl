@@ -63,7 +63,13 @@ serviciosrgl/
 - **Responder o aceptar un pedido es siempre un link firmado** (`django.core.signing`), sin importar el canal por el que llegue.
 - **El notificador es una interfaz con backends** que se eligen por setting (`NOTIFICADORES`):
   - v1: `email` y `semimanual`, que le avisa al admin con un link `wa.me` listo para reenviar.
-  - Siguiente: `telegram`.
+  - `telegram` (implementado, `pedidos/telegram.py`):
+    - El oficio vincula su chat con un link personal firmado (`t.me/<bot>?start=<token>`) que recibe en el mail de bienvenida y en su página de disponibilidad.
+    - El worker lee los mensajes del bot con `getUpdates` en cada vuelta, sin webhook.
+    - El aviso trae un botón que abre el link firmado.
+    - Si el oficio tiene Telegram, no se genera la copia semimanual al admin.
+    - Si bloquea al bot, se desvincula solo y vuelve a mail + semimanual.
+    - Sin dependencias nuevas (`urllib`). Se apaga dejando vacío `TELEGRAM_BOT_TOKEN`.
   - Más adelante: `whatsapp`.
 - **Presupuesto:** fan-out a los oficios del rubro que cubren el barrio. Cada uno responde por link y el vecino elige.
 - **Urgencia:** se arma una cola de oficios de guardia ordenada por `ultima_asignacion` ascendente, salteando a los no disponibles. Si el primero no acepta en `URGENCIA_MINUTOS_PARA_ACEPTAR`, el worker escala al siguiente. Cuando se termina la cola, entra el fallback: lista de oficios con consentimiento y teléfono visible, más un aviso al admin.

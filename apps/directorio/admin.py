@@ -74,21 +74,21 @@ class SuspenderForm(forms.Form):
 class OficioAdmin(admin.ModelAdmin):
     form = OficioAdminForm
     list_display = ["nombre", "lista_rubros", "estado", "es_verificado", "de_guardia",
-                    "telefono_en_fallback", "disponible_ahora", "ultima_asignacion"]
+                    "telefono_en_fallback", "con_telegram", "disponible_ahora", "ultima_asignacion"]
     list_filter = ["estado", "rubros", "de_guardia", "telefono_en_fallback", "city"]
     search_fields = ["nombre", "nombre_guia", "telefono", "email", "matricula"]
     filter_horizontal = ["rubros", "barrios"]
     inlines = [FranjaInline, FotoInline, ConsentimientoInline]
     actions = ["aprobar", "suspender", "revocar_links", "enviar_link_disponibilidad"]
     readonly_fields = ["estado", "ficha", "aprobado_at", "dni_verificado_at", "suspendido_at",
-                       "motivo_suspension", "ultima_asignacion", "telefono_en_fallback",
+                       "motivo_suspension", "ultima_asignacion", "telefono_en_fallback", "telegram_chat_id",
                        "version_links", "creado_at", "actualizado_at"]
     fieldsets = [
         (None, {"fields": ["city", "nombre", "nombre_guia", "slug", "ficha", "rubros", "descripcion"]}),
         ("Estado", {"fields": ["estado", "aprobado_at", "dni_verificado_at", "suspendido_at", "motivo_suspension"],
                     "description": "Se cambia con las acciones de la lista: Aprobar / Suspender."}),
         ("Zona y oficio", {"fields": ["cubre_toda_la_ciudad", "barrios", "anios_oficio", "garantia", "matricula"]}),
-        ("Contacto (privado)", {"fields": ["telefono", "email"]}),
+        ("Contacto (privado)", {"fields": ["telefono", "email", "telegram_chat_id"]}),
         ("Guardia", {"fields": ["de_guardia", "no_disponible_hasta", "ultima_asignacion", "telefono_en_fallback"]}),
         ("Sistema", {"fields": ["version_links", "creado_at", "actualizado_at"], "classes": ["collapse"]}),
     ]
@@ -103,6 +103,10 @@ class OficioAdmin(admin.ModelAdmin):
     @admin.display(description="Verificado", boolean=True)
     def es_verificado(self, obj):
         return obj.verificado
+
+    @admin.display(description="Telegram", boolean=True)
+    def con_telegram(self, obj):
+        return bool(obj.telegram_chat_id)
 
     @admin.display(description="Disponible", boolean=True)
     def disponible_ahora(self, obj):

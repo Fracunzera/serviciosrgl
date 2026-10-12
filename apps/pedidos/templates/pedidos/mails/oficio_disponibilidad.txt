@@ -3,4 +3,7 @@ Hola {{ oficio.nombre }}:
 
 Con este link marcás desde cuándo hasta cuándo no podés tomar trabajos (es personal, no lo reenvíes):
 {{ link_disponibilidad }}
-{% endautoescape %}
+{% if link_telegram %}
+¿Preferís recibir los avisos por Telegram? Es más rápido que el mail. Abrí este link desde el celular y tocá «Iniciar»:
+{{ link_telegram }}
+{% endif %}{% endautoescape %}

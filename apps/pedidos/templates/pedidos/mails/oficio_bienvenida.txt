@@ -12,4 +12,7 @@ Si te vas de vacaciones o no podés tomar trabajos, marcalo acá (guardá este l
 {{ link_disponibilidad }}
 
 La guía no cobra comisiones: el acuerdo y el pago son directos con el vecino.
-{% endautoescape %}
+{% if link_telegram %}
+¿Preferís recibir los avisos por Telegram? Es más rápido que el mail. Abrí este link desde el celular y tocá «Iniciar»:
+{{ link_telegram }}
+{% endif %}{% endautoescape %}

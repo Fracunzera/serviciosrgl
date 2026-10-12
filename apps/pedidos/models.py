@@ -179,6 +179,9 @@ class Mensaje(models.Model):
     destino = models.CharField(max_length=200, help_text="Mail, o chat id para otros canales.")
     asunto = models.CharField(max_length=200)
     texto = models.TextField()
+    # Botón del mensaje en canales que lo soportan (Telegram). En mail el
+    # link ya va en el texto.
+    link = models.URLField(max_length=500, blank=True)
     derivacion = models.ForeignKey(
         Derivacion, null=True, blank=True, on_delete=models.SET_NULL, related_name="mensajes"
     )

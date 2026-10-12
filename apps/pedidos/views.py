@@ -12,7 +12,7 @@ from apps.core.imagenes import achicar
 from apps.core.views import get_city
 from apps.directorio.models import Oficio, Rubro
 
-from . import links, ruteo
+from . import links, ruteo, telegram
 from .forms import DisponibilidadForm, PresupuestoForm, RespuestaForm, UrgenciaForm
 from .models import Derivacion, FotoPedido, Pedido
 from .whatsapp import link_wa
@@ -206,6 +206,10 @@ def disponibilidad(request, firma):
         return _link_invalido(request)
     form = DisponibilidadForm()
     if request.method == "POST":
+        if request.POST.get("accion") == "desvincular_telegram":
+            Oficio.objects.filter(pk=oficio.pk).update(telegram_chat_id="")
+            messages.success(request, "Listo: Telegram desvinculado. Los avisos te llegan por mail.")
+            return redirect(request.path)
         if request.POST.get("accion") == "disponible":
             oficio.no_disponible_hasta = None
             oficio.save(update_fields=["no_disponible_hasta", "actualizado_at"])
@@ -225,4 +229,5 @@ def disponibilidad(request, firma):
         "oficio": oficio,
         "form": form,
         "ausente": not oficio.disponible(),
+        "link_telegram": telegram.link_vinculacion(oficio),
     })

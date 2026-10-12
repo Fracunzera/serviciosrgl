@@ -91,6 +91,8 @@ class Oficio(models.Model):
     no_disponible_hasta = models.DateTimeField(null=True, blank=True)
     # Rotación: la urgencia va primero a quien recibió una hace más tiempo.
     ultima_asignacion = models.DateTimeField(null=True, blank=True)
+    # Lo completa el bot cuando el oficio abre su link de vinculación.
+    telegram_chat_id = models.CharField(max_length=32, blank=True)
     # Caché del último Consentimiento de tipo fallback (el historial está allá).
     telefono_en_fallback = models.BooleanField("teléfono en fallback", default=False)
 
