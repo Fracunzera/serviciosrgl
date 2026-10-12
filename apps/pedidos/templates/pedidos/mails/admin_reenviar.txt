@@ -1,0 +1,12 @@
+{% autoescape off %}-
+Aviso para {{ oficio.nombre }} ({{ oficio.telefono }}):
+
+{% if wa %}Reenviar por WhatsApp (abre el chat con el texto listo):
+{{ wa }}
+{% else %}No pude armar el link de WhatsApp: revisá el teléfono cargado.
+{% endif %}
+----- texto del aviso -----
+{{ asunto }}
+
+{{ texto }}
+{% endautoescape %}

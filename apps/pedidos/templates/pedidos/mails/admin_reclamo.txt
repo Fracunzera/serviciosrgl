@@ -1,0 +1,11 @@
+{% autoescape off %}[Reclamo] {{ pedido.oficio_asignado.nombre }} — pedido #{{ pedido.pk }}
+Un vecino hizo un reclamo sobre {{ pedido.oficio_asignado.nombre }}.
+
+"{{ reclamo.texto }}"
+
+Pedido: {{ pedido.rubro.nombre }} en {{ pedido.barrio.nombre }} ({{ pedido.get_estado_display }})
+Vecino: {{ pedido.nombre_vecino }} — {{ pedido.telefono_vecino }}{% if pedido.email_vecino %} — {{ pedido.email_vecino }}{% endif %}
+Seguimiento: {{ link }}
+
+Revisalo en el admin. Si corresponde, suspendé el perfil dejando el motivo.
+{% endautoescape %}

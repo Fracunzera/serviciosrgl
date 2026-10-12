@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block titulo %}Tu disponibilidad · Servicios RGL{% endblock %}
+{% block robots %}<meta name="robots" content="noindex">{% endblock %}
+
+{% block contenido %}
+<h1 class="rubro-titulo">{{ oficio.nombre }}: disponibilidad</h1>
+
+{% if ausente %}
+<p class="esperando">Estás marcado como no disponible hasta el {{ oficio.no_disponible_hasta|date:"l j \d\e F, H:i" }}. No te llegan pedidos ni urgencias.</p>
+<div class="acciones"><form method="post">{% csrf_token %}<button class="boton boton--grande" name="accion" value="disponible">Ya estoy disponible</button></form></div>
+<h2 class="seccion-titulo">Cambiar la fecha</h2>
+{% else %}
+<p class="esperando">Estás disponible: te llegan pedidos{% if oficio.de_guardia %} y urgencias en tus horarios de guardia{% endif %}.</p>
+<h2 class="seccion-titulo">¿Te vas o no podés tomar trabajos?</h2>
+{% endif %}
+
+<form class="formulario" method="post" novalidate>
+  {% csrf_token %}
+  {% include "_campo.html" with campo=form.hasta %}
+  <div class="acciones"><button class="boton" name="accion" value="ausente">Marcarme no disponible</button></div>
+</form>
+<p class="campo__ayuda">Este link es personal: no lo reenvíes. Si cambiaron tus horarios de guardia, escribile al administrador de la guía.</p>
+{% endblock %}

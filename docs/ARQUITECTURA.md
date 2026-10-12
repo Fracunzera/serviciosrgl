@@ -101,6 +101,27 @@ resenas           │   Pedido ─ Resena >─ Oficio  (1:1 con pedido, o bootst
   - Sin pedido, únicamente si es de bootstrap (lo asegura una constraint en la base).
   - Se publica al instante y el admin puede ocultarla (moderación posterior).
 
+## Flujo de pedidos (implementación)
+
+- **Bandeja de salida (`Mensaje`).** La web nunca manda mails: encola filas en la misma transacción del cambio de estado y el worker las despacha.
+  - Reintenta a los 2, 4, 8, 16 y 32 minutos; después marca el mensaje como `fallido`.
+  - Así un SMTP lento no retiene el lock de SQLite dentro de un request, y si el SMTP se cae los avisos salen cuando vuelve.
+  - La demora máxima es `WORKER_INTERVALO_SEGUNDOS` (10 s).
+- **Un GET nunca cambia estado.** Los antivirus de mail (Safe Links y similares) abren los links para analizarlos. Aceptar, rechazar, elegir y confirmar son botones POST.
+- **Escalado (`ruteo.escalar`).** Es idempotente y lo llaman la web (al crear el pedido y al rechazar) y el worker (en cada vuelta).
+  - Si hay un oficio con el plazo corriendo, no hace nada.
+  - Si venció, pasa al siguiente: primero los que cubren el barrio, después el resto de la guardia, cada grupo ordenado por `ultima_asignacion`.
+  - Cuando no queda nadie, entra el fallback.
+  - Aceptar tarde vale mientras nadie más haya tomado el pedido.
+- **Fallback.** El vecino ve los teléfonos de los oficios de guardia del rubro que dieron consentimiento, y al admin le llega un mail con el contacto del vecino.
+- **Limpieza automática** (worker):
+  - Asignado hace 24 h sin confirmación del vecino → completado y se le pide la reseña.
+  - Presupuesto abierto hace más de 30 días → cerrado.
+  - Urgencia en fallback hace más de 24 h → cerrada.
+- **Antispam.** Un campo trampa (honeypot) y como máximo 3 pedidos por teléfono por hora.
+- **Fotos.** Se achican a 1600 px de lado y se re-codifican a JPEG. Eso descarta el EXIF, que en fotos de celular trae la ubicación GPS de la casa.
+- **Pedido directo.** Desde la ficha de un oficio, el pedido de presupuesto le llega solo a él. Desde el rubro o la home, a todos los que cubren el barrio.
+
 ## Monetización (no se construye, solo no se bloquea)
 
 - `base.html` tiene un bloque de footer reservado para sponsor o Cafecito, que se prende con un setting.

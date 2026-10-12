@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block titulo %}Tu reseña · Servicios RGL{% endblock %}
+{% block robots %}<meta name="robots" content="noindex">{% endblock %}
+{% block contenido %}
+<p class="migas"><a href="{% url 'pedidos:seguimiento' pedido.token %}">Tu pedido</a> › Reseña</p>
+<h1 class="rubro-titulo">¿Cómo te fue con {{ pedido.oficio_asignado.nombre }}?</h1>
+<form class="formulario aviso" method="post" novalidate>
+  <div class="aviso__cuerpo">
+    {% csrf_token %}
+    {% include "_campo.html" with campo=form.estrellas opciones_clase="opciones--estrellas" %}
+    {% include "_campo.html" with campo=form.texto %}
+    {% include "_campo.html" with campo=form.autor %}
+    <div class="acciones"><button class="boton boton--grande" type="submit">Publicar reseña</button></div>
+  </div>
+</form>
+{% endblock %}

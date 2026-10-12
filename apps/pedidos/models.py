@@ -7,6 +7,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Q
+from django.utils import timezone
 
 from apps.core.models import Barrio, City
 from apps.directorio.models import Oficio, Rubro
@@ -158,3 +159,43 @@ class Derivacion(models.Model):
 
     def __str__(self):
         return f"Pedido #{self.pedido_id} → {self.oficio} ({self.get_estado_display()})"
+
+
+class Mensaje(models.Model):
+    """Bandeja de salida. La web solo encola; el worker envía y reintenta.
+
+    Así un SMTP lento nunca retiene el lock de escritura de SQLite dentro de
+    un request, y si el SMTP se cae los avisos salen cuando vuelve.
+    """
+
+    class Estado(models.TextChoices):
+        PENDIENTE = "pendiente", "Pendiente"
+        ENVIADO = "enviado", "Enviado"
+        FALLIDO = "fallido", "Falló (sin más reintentos)"
+
+    canal = models.CharField(max_length=20, default="email")
+    destino = models.CharField(max_length=200, help_text="Mail, o chat id para otros canales.")
+    asunto = models.CharField(max_length=200)
+    texto = models.TextField()
+    derivacion = models.ForeignKey(
+        Derivacion, null=True, blank=True, on_delete=models.SET_NULL, related_name="mensajes"
+    )
+    pedido = models.ForeignKey(
+        Pedido, null=True, blank=True, on_delete=models.SET_NULL, related_name="mensajes"
+    )
+
+    estado = models.CharField(max_length=10, choices=Estado.choices, default=Estado.PENDIENTE)
+    intentos = models.PositiveSmallIntegerField(default=0)
+    proximo_intento_at = models.DateTimeField(default=timezone.now)
+    ultimo_error = models.TextField(blank=True)
+    creado_at = models.DateTimeField(auto_now_add=True)
+    enviado_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        verbose_name = "mensaje saliente"
+        verbose_name_plural = "mensajes salientes"
+        ordering = ["-creado_at"]
+        indexes = [models.Index(fields=["estado", "proximo_intento_at"])]
+
+    def __str__(self):
+        return f"[{self.canal}] {self.asunto} → {self.destino}"

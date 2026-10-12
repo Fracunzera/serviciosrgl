@@ -1,0 +1,8 @@
+{% autoescape off %}[Sin oficios] Presupuesto de {{ pedido.rubro.nombre }} en {{ pedido.barrio.nombre }}
+Llegó un pedido de presupuesto y no hay ningún oficio disponible de {{ pedido.rubro.nombre }} que cubra {{ pedido.barrio.nombre }}.
+
+Trabajo: {{ pedido.descripcion }}
+Vecino: {{ pedido.nombre_vecino }} — {{ pedido.telefono_vecino }}{% if pedido.email_vecino %} — {{ pedido.email_vecino }}{% endif %}
+
+Seguimiento: {{ link }}
+{% endautoescape %}

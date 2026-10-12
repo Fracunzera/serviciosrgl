@@ -1,0 +1,8 @@
+{% autoescape off %}¿Cómo te fue con {{ pedido.oficio_asignado.nombre }}?
+Hola {{ pedido.nombre_vecino }}:
+
+Contanos cómo fue el trabajo de {{ pedido.oficio_asignado.nombre }}. Tu reseña ayuda a otros vecinos a elegir:
+{{ link }}
+
+¿Hubo un problema? En el mismo link podés hacer un reclamo.
+{% endautoescape %}

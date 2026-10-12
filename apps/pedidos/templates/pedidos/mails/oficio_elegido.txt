@@ -1,0 +1,8 @@
+{% autoescape off %}Te eligieron para el trabajo de {{ pedido.rubro.nombre|lower }} en {{ pedido.barrio.nombre }}
+Hola {{ oficio.nombre }}:
+
+El vecino eligió tu presupuesto. Entrá acá para ver su nombre, teléfono y dirección:
+{{ link }}
+
+Recordá: el acuerdo y el pago son directos entre ustedes.
+{% endautoescape %}

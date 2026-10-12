@@ -189,7 +189,13 @@ URGENCIA_MINUTOS_PARA_ACEPTAR = int(env("URGENCIA_MINUTOS_PARA_ACEPTAR", "10"))
 # (y queda habilitada la reseña) a las N horas de asignado.
 PEDIDO_HORAS_AUTOCOMPLETAR = int(env("PEDIDO_HORAS_AUTOCOMPLETAR", "24"))
 # Cada cuántos segundos el worker revisa pedidos vencidos.
-WORKER_INTERVALO_SEGUNDOS = int(env("WORKER_INTERVALO_SEGUNDOS", "30"))
+# Bajo porque el worker también despacha los mails (outbox): es la demora
+# máxima entre que se crea un aviso y sale.
+WORKER_INTERVALO_SEGUNDOS = int(env("WORKER_INTERVALO_SEGUNDOS", "10"))
+# Vigencia de los links firmados que reciben los oficios.
+LINKS_OFICIO_DIAS = int(env("LINKS_OFICIO_DIAS", "60"))
+# Antispam: pedidos por teléfono por hora.
+PEDIDOS_POR_TELEFONO_POR_HORA = 3
 FACEBOOK_GRUPO_URL = env("FACEBOOK_GRUPO_URL", "")
 
 # --- Seguridad detrás del reverse proxy --------------------------------------

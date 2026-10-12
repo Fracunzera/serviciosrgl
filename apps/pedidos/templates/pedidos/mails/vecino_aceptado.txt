@@ -1,0 +1,8 @@
+{% autoescape off %}{{ oficio.nombre }} tomó tu urgencia
+Hola {{ pedido.nombre_vecino }}:
+
+{{ oficio.nombre }} aceptó tu pedido y ya tiene tu contacto. Su teléfono está acá:
+{{ link }}
+
+Cuando termine, confirmá en ese mismo link que se hizo el trabajo y dejá tu reseña.
+{% endautoescape %}

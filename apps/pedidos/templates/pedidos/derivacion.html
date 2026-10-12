@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block titulo %}{% if pedido.es_urgencia %}Urgencia{% else %}Presupuesto{% endif %} de {{ pedido.rubro.nombre|lower }} · Servicios RGL{% endblock %}
+{% block robots %}<meta name="robots" content="noindex">{% endblock %}
+
+{% block cabezal %}
+<div class="cabezal">
+  <span>Para {{ oficio.nombre }}</span>
+  <span class="cabezal__centro">{% if pedido.es_urgencia %}Urgencia{% else %}Presupuesto{% endif %} N.º {{ pedido.pk }}</span>
+  <span>{{ pedido.barrio.nombre }}</span>
+</div>
+{% endblock %}
+
+{% block contenido %}
+<div class="ficha">
+  <div>
+    <article class="aviso{% if pedido.es_urgencia %} aviso--negro{% endif %}">
+      <div class="aviso__cuerpo">
+        <p class="aviso__bajada">{% if pedido.es_urgencia %}Urgencia{% else %}Pedido de presupuesto{% endif %}</p>
+        <h1 class="aviso__titulo">{{ pedido.rubro.nombre }} en {{ pedido.barrio.nombre }}</h1>
+      </div>
+    </article>
+
+    {% if not activo %}
+    <p class="aviso-suspendido">Tu perfil no está activo en la guía, así que no podés tomar pedidos. Escribile al administrador.</p>
+
+    {% elif es_mio %}
+    <h2 class="seccion-titulo">Contacto del vecino</h2>
+    <p class="contacto">{{ pedido.nombre_vecino }}<br><a href="tel:{{ pedido.telefono_vecino }}">☎ {{ pedido.telefono_vecino }}</a></p>
+    {% if pedido.direccion %}<p><strong>Dirección:</strong> {{ pedido.direccion }}, {{ pedido.barrio.nombre }}</p>{% endif %}
+    {% if wa_vecino %}<p><a class="boton" href="{{ wa_vecino }}" rel="noopener">Escribirle por WhatsApp</a></p>{% endif %}
+    <p class="campo__ayuda">El acuerdo y el pago son directos entre ustedes. Al terminar, el vecino puede dejar una reseña en tu ficha.</p>
+
+    {% elif puede_aceptar %}
+    <h2 class="seccion-titulo">¿La tomás?</h2>
+    {% if d.estado == "enviada" %}<p class="esperando">Tenés hasta las {{ d.vence_at|time:"H:i" }}. Después pasa al siguiente de guardia.</p>
+    {% else %}<p class="esperando">Se te pasó el plazo, pero todavía nadie la tomó: si podés ir, aceptala.</p>{% endif %}
+    <p>Al aceptar ves el nombre, teléfono y dirección del vecino, y él ve el tuyo.</p>
+    <div class="acciones">
+      <form method="post">{% csrf_token %}<button class="boton boton--grande" name="accion" value="aceptar">Acepto, voy</button></form>
+      <form method="post">{% csrf_token %}<button class="boton boton--claro" name="accion" value="rechazar">No puedo</button></form>
+    </div>
+
+    {% elif puede_responder %}
+    <h2 class="seccion-titulo">Respondé al vecino</h2>
+    <form class="formulario" method="post" novalidate>
+      {% csrf_token %}
+      {% include "_campo.html" with campo=form.mensaje %}
+      {% include "_campo.html" with campo=form.monto %}
+      <div class="acciones">
+        <button class="boton" name="accion" value="responder">Enviar respuesta</button>
+        <button class="boton boton--claro" name="accion" value="rechazar" formnovalidate>No me interesa</button>
+      </div>
+    </form>
+
+    {% elif d.estado == "respondida" and pedido.estado == "abierto" %}
+    <h2 class="seccion-titulo">Respuesta enviada</h2>
+    <p>«{{ d.mensaje }}»{% if d.monto %} — ${{ d.monto }}{% endif %}</p>
+    <p>Si el vecino te elige, te avisamos y acá vas a ver su contacto.</p>
+
+    {% elif d.estado == "rechazada" %}
+    <p class="esperando">Lo rechazaste. ¡Gracias por avisar!</p>
+
+    {% else %}
+    <p class="esperando">{% if pedido.estado == "abierto" %}Este pedido ya no está disponible para vos.{% elif pedido.estado == "cerrado" %}El vecino cerró este pedido.{% else %}Este pedido lo tomó otro oficio. ¡Gracias igual!{% endif %}</p>
+    {% endif %}
+  </div>
+
+  <aside>
+    <section class="aviso">
+      <div class="aviso__cabeza"><strong>EL PEDIDO</strong></div>
+      <div class="aviso__cuerpo">{% include "pedidos/_resumen.html" %}</div>
+    </section>
+    <p class="ver-tambien">¿No estás disponible estos días? <a href="{{ link_disponibilidad }}">Marcalo acá</a> y no te llegan avisos.</p>
+  </aside>
+</div>
+{% endblock %}

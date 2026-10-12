@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block titulo %}Urgencias · Servicios RGL{% endblock %}
+
+{% block cabezal %}
+<div class="cabezal"><span>Línea de urgencias</span><span class="cabezal__centro">{{ city.nombre }}</span><span>Guardia</span></div>
+{% endblock %}
+
+{% block contenido %}
+<p class="migas"><a href="{% url 'core:home' city.slug %}">Índice</a> › Urgencias</p>
+
+<section class="aviso aviso--negro urgencias">
+  <div class="aviso__cuerpo">
+    <h1>Urgencia de fin de semana</h1>
+    <p>Le avisamos al oficio que está de guardia. Si no acepta en {{ minutos|default:"pocos" }} minutos, pasa al siguiente. Vas a ver en pantalla cuando alguien la tome.</p>
+    <p><strong>Si hay olor fuerte a gas, fuego o riesgo para alguien: llamá primero al <a href="tel:100">100</a>.</strong></p>
+  </div>
+</section>
+
+<form class="formulario aviso" method="post" enctype="multipart/form-data" novalidate>
+  <div class="aviso__cuerpo">
+    {% csrf_token %}
+    {% for e in form.non_field_errors %}<p class="campo__error" role="alert">✖ {{ e }}</p>{% endfor %}
+    {% include "_campo.html" with campo=form.rubro %}
+    {% include "_campo.html" with campo=form.descripcion %}
+    {% include "_campo.html" with campo=form.barrio %}
+    {% include "_campo.html" with campo=form.direccion %}
+    <hr class="filete">
+    {% include "_campo.html" with campo=form.nombre_vecino %}
+    {% include "_campo.html" with campo=form.telefono_vecino %}
+    {% include "_campo.html" with campo=form.email_vecino %}
+    {% include "_campo.html" with campo=form.fotos %}
+    {% include "pedidos/_honeypot.html" %}
+    <p class="campo__ayuda">Tu teléfono y tu dirección solo los ve el oficio que acepte. La guía no cobra nada: el pago es directo con el oficio.</p>
+    <div class="acciones"><button class="boton boton--grande" type="submit">Pedir urgencia ahora</button></div>
+  </div>
+</form>
+{% endblock %}

@@ -16,14 +16,14 @@
       <h2 id="titulo-urgencias">Urgencias de fin de semana</h2>
       <p>¿Pérdida de agua, corte de luz, olor a gas o te quedaste afuera un sábado? La línea de urgencias deriva tu pedido al oficio que está de guardia.</p>
       <ul>
-        {% for r in urgencias %}<li>{{ r.nombre }}</li>{% endfor %}
+        {% for r in urgencias %}<li><a href="{% url 'pedidos:urgencia' city.slug %}?rubro={{ r.slug }}">{{ r.nombre }}</a></li>{% endfor %}
       </ul>
-      <span class="boton boton--claro" aria-disabled="true">Pedir urgencia · próximamente</span>
+      <a class="boton boton--claro boton--grande" href="{% url 'pedidos:urgencia' city.slug %}">Pedir urgencia</a>
     </div>
   </section>
   <section class="portada__indice" aria-labelledby="titulo-indice">
     <h1 class="rubro-titulo" id="titulo-indice">Índice de rubros</h1>
-    <p class="ver-tambien">Buscá el oficio por rubro. Todos los perfiles los aprueba la guía, con DNI verificado.</p>
+    <p class="ver-tambien">Buscá el oficio por rubro, o <a href="{% url 'pedidos:presupuesto' city.slug %}">pedí presupuesto</a> y que te respondan los de tu barrio. Todos los perfiles los aprueba la guía, con DNI verificado.</p>
 
     <ul class="pestanas" aria-label="Letras">
       {% for letra, _ in indice %}<li><a href="#letra-{{ letra }}">{{ letra }}</a></li>{% endfor %}

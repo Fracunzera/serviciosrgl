@@ -1,0 +1,16 @@
+{% autoescape off %}Pedido de presupuesto: {{ pedido.rubro.nombre }} en {{ pedido.barrio.nombre }}
+Hola {{ oficio.nombre }}:
+
+Un vecino de {{ pedido.barrio.nombre }} pide presupuesto.
+
+Rubro: {{ pedido.rubro.nombre }}
+Barrio: {{ pedido.barrio.nombre }}
+Trabajo: {{ pedido.descripcion }}
+
+Si te interesa, respondé con un mensaje y, si querés, un monto estimado:
+{{ link }}
+
+El vecino ve las respuestas y elige. Cuando te elige, te avisamos y ves su contacto.
+
+¿No estás disponible estos días? {{ link_disponibilidad }}
+{% endautoescape %}

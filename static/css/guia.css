@@ -575,3 +575,195 @@ img {
   clip: rect(0 0 0 0);
   white-space: nowrap;
 }
+
+/* ---- Formularios: el cupón para recortar de la guía -------------------- */
+
+.formulario {
+  max-width: 640px;
+}
+
+.campo {
+  margin-bottom: 1rem;
+}
+
+.campo label,
+.campo legend {
+  display: block;
+  font-weight: 700;
+  font-size: 0.9rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-bottom: 0.25rem;
+}
+
+.campo fieldset {
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+
+.campo input:not([type="radio"]):not([type="checkbox"]),
+.campo select,
+.campo textarea {
+  width: 100%;
+  font: inherit;
+  font-size: 1.05rem;
+  color: var(--tinta);
+  background: #fffbe3;
+  border: 2px solid var(--tinta);
+  border-radius: 0;
+  padding: 0.55rem 0.6rem;
+}
+
+.campo input:focus,
+.campo select:focus,
+.campo textarea:focus {
+  outline: 3px solid var(--tinta);
+  outline-offset: 1px;
+}
+
+.campo__ayuda {
+  font-size: 0.88rem;
+  color: var(--tinta-suave);
+  margin: 0.25rem 0 0;
+}
+
+.campo__error {
+  font-weight: 700;
+  margin: 0.3rem 0 0;
+}
+
+.campo--error input,
+.campo--error select,
+.campo--error textarea {
+  border-width: 3px;
+  border-style: dashed;
+}
+
+/* Opciones grandes (rubro de urgencia, estrellas): fáciles de tocar. */
+.opciones {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 0.5rem;
+}
+
+.opcion {
+  display: flex !important;
+  align-items: center;
+  gap: 0.5rem;
+  border: 2px solid var(--tinta);
+  background: #fffbe3;
+  padding: 0.7rem 0.75rem;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 1rem !important;
+}
+
+.opcion:has(input:checked) {
+  background: var(--tinta);
+  color: var(--papel);
+}
+
+.opcion input {
+  accent-color: var(--tinta);
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
+.opciones--estrellas .opcion {
+  font-size: 1.3rem !important;
+  letter-spacing: 0.1em;
+}
+
+/* Honeypot antispam. */
+.hp {
+  position: absolute;
+  left: -9999px;
+}
+
+.mensajes {
+  margin-bottom: 1rem;
+}
+
+.mensaje {
+  border: 3px solid var(--tinta);
+  background: #fffbe3;
+  font-weight: 700;
+  padding: 0.6rem 0.75rem;
+  margin: 0 0 0.5rem;
+}
+
+.mensaje--error {
+  border-style: double;
+  border-width: 5px;
+}
+
+.acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  align-items: center;
+  margin: 1rem 0;
+}
+
+.acciones form {
+  margin: 0;
+}
+
+.boton--grande {
+  font-size: 1.15rem;
+  padding: 0.8rem 1.2rem;
+}
+
+.boton--chico {
+  font-size: 0.85rem;
+  padding: 0.35rem 0.6rem;
+}
+
+/* Contacto revelado: grande, para tocar y llamar. */
+.contacto {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.contacto a {
+  text-decoration-thickness: 2px;
+}
+
+.estado {
+  display: inline-block;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border: 2px solid var(--tinta);
+  padding: 0.1rem 0.5rem;
+}
+
+.respuesta {
+  border-bottom: 1px dotted var(--puntos);
+  padding: 0.75rem 0;
+}
+
+.respuesta p {
+  margin: 0.3rem 0;
+}
+
+.fotos-pedido {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 0.5rem;
+  margin: 0.75rem 0;
+}
+
+.fotos-pedido img {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border: 2px solid var(--tinta);
+}
+
+.esperando {
+  font-size: 1.15rem;
+  font-weight: 700;
+}

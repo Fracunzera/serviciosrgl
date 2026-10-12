@@ -1,0 +1,10 @@
+{% autoescape off %}Recibimos tu pedido de {{ pedido.rubro.nombre|lower }}
+Hola {{ pedido.nombre_vecino }}:
+
+{% if cantidad %}Le avisamos a {{ cantidad }} oficio{{ cantidad|pluralize }} de {{ pedido.rubro.nombre|lower }} que trabaja{{ cantidad|pluralize:"n" }} en {{ pedido.barrio.nombre }}. Te mandamos un mail con cada respuesta.{% else %}Por ahora no hay oficios de {{ pedido.rubro.nombre|lower }} disponibles para {{ pedido.barrio.nombre }}. Ya nos avisaron y vamos a tratar de conseguirte uno.{% endif %}
+
+Seguí tu pedido, mirá las respuestas y elegí acá:
+{{ link }}
+
+Guardá este link: también sirve para dejar tu reseña cuando termine el trabajo.
+{% endautoescape %}

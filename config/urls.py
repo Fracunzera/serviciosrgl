@@ -15,6 +15,9 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("healthz", healthz),
     path("", core_views.raiz),
+    # Antes que las rutas de ciudad: s/, p/ y o/ no son ciudades.
+    path("", include("apps.pedidos.urls")),
+    path("", include("apps.resenas.urls")),
     # Todo lo público cuelga de la ciudad: /rio-gallegos/...
     path("<slug:city_slug>/", include("apps.core.urls")),
     path("<slug:city_slug>/", include("apps.directorio.urls")),

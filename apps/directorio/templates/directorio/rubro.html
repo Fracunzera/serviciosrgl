@@ -23,6 +23,8 @@
 <p class="ver-tambien">En este rubro la guía controla la matrícula de cada oficio.</p>
 {% endif %}
 
+<p class="acciones"><a class="boton" href="{% url 'pedidos:presupuesto' city.slug %}?rubro={{ rubro.slug }}">Pedí presupuesto a todos</a>{% if rubro.en_urgencias %} <a class="boton boton--claro" href="{% url 'pedidos:urgencia' city.slug %}?rubro={{ rubro.slug }}">Urgencia</a>{% endif %}</p>
+
 {% if oficios %}
 <div class="columnas">
   {% for o in oficios %}{% include "directorio/_entrada.html" %}{% endfor %}

@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block titulo %}Pedí presupuesto · Servicios RGL{% endblock %}
+
+{% block cabezal %}
+<div class="cabezal"><span>Pedido de presupuesto</span><span class="cabezal__centro">{{ city.nombre }}</span><span>Cupón</span></div>
+{% endblock %}
+
+{% block contenido %}
+<p class="migas"><a href="{% url 'core:home' city.slug %}">Índice</a> › Pedí presupuesto</p>
+<h1 class="rubro-titulo">Pedí presupuesto</h1>
+{% if directo %}
+<p class="ver-tambien">Pedido directo a <a href="{% url 'directorio:oficio' city.slug directo.slug %}">{{ directo.nombre }}</a>. Si preferís que respondan varios oficios, <a href="{% url 'pedidos:presupuesto' city.slug %}">hacé un pedido abierto</a>.</p>
+{% else %}
+<p class="ver-tambien">Le llega a los oficios del rubro que trabajan en tu barrio. Te responden por la guía y vos elegís.</p>
+{% endif %}
+
+<form class="formulario aviso" method="post" enctype="multipart/form-data" novalidate>
+  <div class="aviso__cuerpo">
+    {% csrf_token %}
+    {% if directo %}<input type="hidden" name="oficio" value="{{ directo.slug }}">{% endif %}
+    {% for e in form.non_field_errors %}<p class="campo__error" role="alert">✖ {{ e }}</p>{% endfor %}
+    {% include "_campo.html" with campo=form.rubro %}
+    {% include "_campo.html" with campo=form.descripcion %}
+    {% include "_campo.html" with campo=form.fotos %}
+    {% include "_campo.html" with campo=form.barrio %}
+    <hr class="filete">
+    {% include "_campo.html" with campo=form.nombre_vecino %}
+    {% include "_campo.html" with campo=form.telefono_vecino %}
+    {% include "_campo.html" with campo=form.email_vecino %}
+    {% include "_campo.html" with campo=form.direccion %}
+    {% include "pedidos/_honeypot.html" %}
+    <p class="campo__ayuda">Tu teléfono y tu dirección no se publican: solo los ve el oficio que elijas. El acuerdo y el pago son directos entre ustedes.</p>
+    <div class="acciones"><button class="boton boton--grande" type="submit">Enviar pedido</button></div>
+  </div>
+</form>
+{% endblock %}

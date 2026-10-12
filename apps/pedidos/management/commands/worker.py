@@ -1,6 +1,7 @@
 """
-Loop del worker: cada N segundos procesa los pedidos que necesitan algo
-(escalar una urgencia vencida, disparar el fallback).
+Loop del worker: cada N segundos escala urgencias vencidas (o dispara el
+fallback), completa pedidos que el vecino no confirmó, cierra pedidos
+viejos y despacha la bandeja de salida.
 
 Todo el estado vive en la base, así que matar y reiniciar el contenedor es
 seguro: el próximo tick retoma donde quedó.
@@ -13,6 +14,8 @@ import time
 from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.db import close_old_connections
+
+from apps.pedidos import notificaciones, ruteo
 
 log = logging.getLogger(__name__)
 
@@ -49,8 +52,16 @@ class Command(BaseCommand):
         log.info("worker detenido")
 
     def tick(self):
-        # Paso 4: escalado de urgencias y fallback.
-        pass
+        # Primero el ruteo (puede encolar avisos), después el envío.
+        escaladas = ruteo.procesar_urgencias()
+        completados = ruteo.autocompletar()
+        cerrados = ruteo.cerrar_viejos()
+        enviados = notificaciones.enviar_pendientes()
+        if escaladas or completados or cerrados or enviados:
+            log.info(
+                "tick: %s escaladas, %s autocompletados, %s cerrados, %s mensajes enviados",
+                escaladas, completados, cerrados, enviados,
+            )
 
     def _parar(self, signum, frame):
         self.seguir = False

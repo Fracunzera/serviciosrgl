@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block titulo %}Reclamo · Servicios RGL{% endblock %}
+{% block robots %}<meta name="robots" content="noindex">{% endblock %}
+{% block contenido %}
+<p class="migas"><a href="{% url 'pedidos:seguimiento' pedido.token %}">Tu pedido</a> › Reclamo</p>
+<h1 class="rubro-titulo">Reclamo sobre {{ pedido.oficio_asignado.nombre }}</h1>
+<form class="formulario aviso" method="post" novalidate>
+  <div class="aviso__cuerpo">
+    {% csrf_token %}
+    {% include "_campo.html" with campo=form.texto %}
+    <div class="acciones"><button class="boton" type="submit">Enviar reclamo</button></div>
+  </div>
+</form>
+{% endblock %}

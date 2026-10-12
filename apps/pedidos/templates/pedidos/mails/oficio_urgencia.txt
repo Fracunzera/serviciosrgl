@@ -1,0 +1,16 @@
+{% autoescape off %}URGENCIA {{ pedido.rubro.nombre|upper }} en {{ pedido.barrio.nombre }} — ¿la tomás?
+Hola {{ oficio.nombre }}:
+
+Hay una urgencia y sos el oficio de guardia.
+
+Rubro: {{ pedido.rubro.nombre }}
+Barrio: {{ pedido.barrio.nombre }}
+Problema: {{ pedido.descripcion }}
+
+Tenés {{ minutos }} minutos para aceptarla. Si no, pasa al siguiente de guardia.
+Aceptá o rechazá acá (al aceptar ves el contacto y la dirección):
+{{ link }}
+
+¿No estás disponible estos días? Marcalo acá y no te llegan más avisos:
+{{ link_disponibilidad }}
+{% endautoescape %}

@@ -77,7 +77,7 @@
       <div class="aviso__cabeza"><strong>¿NECESITÁS ESTE SERVICIO?</strong></div>
       <div class="aviso__cuerpo">
         <p>Pedí presupuesto por la guía. Tu teléfono se comparte solo con el oficio que elijas.</p>
-        <span class="boton" aria-disabled="true">Pedir presupuesto · próximamente</span>
+        {% if suspendido %}<p><strong>Este perfil no recibe pedidos.</strong></p>{% else %}<a class="boton boton--grande" href="{% url 'pedidos:presupuesto' city.slug %}?oficio={{ oficio.slug }}">Pedir presupuesto</a>{% endif %}
       </div>
     </section>
     <p class="ver-tambien">Los teléfonos de los oficios no se publican: el contacto se hace por la guía para que cada trabajo quede registrado y se pueda reseñar.</p>

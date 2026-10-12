@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% load guia %}
+{% block titulo %}Tu pedido de {{ pedido.rubro.nombre|lower }} · Servicios RGL{% endblock %}
+{% block robots %}<meta name="robots" content="noindex">
+  {% if pedido.es_urgencia and pedido.estado == "abierto" %}<meta http-equiv="refresh" content="{% if fallback %}60{% else %}20{% endif %}">{% endif %}{% endblock %}
+
+{% block cabezal %}
+<div class="cabezal">
+  <span>{% if pedido.es_urgencia %}Urgencia{% else %}Presupuesto{% endif %} N.º {{ pedido.pk }}</span>
+  <span class="cabezal__centro">{{ pedido.rubro.nombre }}</span>
+  <span>{{ pedido.get_estado_display }}</span>
+</div>
+{% endblock %}
+
+{% block contenido %}
+<div class="ficha">
+  <div>
+    {# ---- Asignado o completado: el contacto del oficio ---- #}
+    {% if pedido.oficio_asignado %}
+    {% with o=pedido.oficio_asignado %}
+    <article class="aviso">
+      <header class="aviso__cabeza">
+        <p class="aviso__bajada">{% if pedido.es_urgencia %}Tomó tu urgencia{% else %}Elegiste a{% endif %}</p>
+        <h1 class="aviso__titulo">{{ o.nombre }}</h1>
+      </header>
+      <div class="aviso__cuerpo">
+        <p class="contacto"><a href="tel:{{ o.telefono }}">☎ {{ o.telefono }}</a></p>
+        {% if wa_oficio %}<p><a class="boton" href="{{ wa_oficio }}" rel="noopener">Escribirle por WhatsApp</a></p>{% endif %}
+        <p>Ya tiene tu contacto. <a href="{% url 'directorio:oficio' pedido.city.slug o.slug %}">Ver su ficha y reseñas</a>.</p>
+      </div>
+    </article>
+    {% endwith %}
+
+    {% if pedido.estado == "asignado" %}
+    <h2 class="seccion-titulo">¿Ya se hizo el trabajo?</h2>
+    <p>Confirmalo y dejá tu reseña. Si no lo confirmás, el pedido se da por terminado solo a las {{ pedido.vence_autocompletado|date:"H:i \d\e\l D j/n" }} y podés opinar igual.</p>
+    <div class="acciones">
+      <form method="post">{% csrf_token %}<button class="boton" name="accion" value="confirmar">Sí, ya se hizo</button></form>
+      <a href="{% url 'resenas:reclamo' pedido.token %}">Tuve un problema</a>
+    </div>
+    {% elif pedido.estado == "completado" %}
+    <h2 class="seccion-titulo">Tu reseña</h2>
+    {% if resena %}
+    <p><span class="estrellas">{{ resena.estrellas|estrellas }}</span> {{ resena.texto }}</p>
+    <p class="resena__pie">Publicada en la ficha como «{{ resena.autor }}».</p>
+    {% else %}
+    <p>Contale a otros vecinos cómo te fue.</p>
+    <div class="acciones"><a class="boton boton--grande" href="{% url 'resenas:resena' pedido.token %}">Dejar mi reseña</a></div>
+    {% endif %}
+    <p><a href="{% url 'resenas:reclamo' pedido.token %}">¿Hubo un problema? Hacé un reclamo</a></p>
+    {% endif %}
+
+    {# ---- Urgencia abierta ---- #}
+    {% elif pedido.es_urgencia and pedido.estado == "abierto" %}
+    {% if fallback %}
+    <h1 class="rubro-titulo">Llamá directo a la guardia</h1>
+    <p>Ningún oficio de guardia pudo tomar tu pedido a tiempo. Estos aceptaron que su teléfono figure acá para urgencias:</p>
+    {% for o, wa in fallback %}
+    <div class="entrada">
+      <div class="linea"><span class="entrada__nombre">{{ o.nombre }}</span><span class="linea__puntos" aria-hidden="true"></span><a class="linea__dato" href="tel:{{ o.telefono }}">{{ o.telefono }}</a></div>
+      {% if wa %}<p class="entrada__detalle"><a href="{{ wa }}" rel="noopener">WhatsApp</a></p>{% endif %}
+    </div>
+    {% empty %}
+    <p class="esperando">No hay oficios de guardia de {{ pedido.rubro.nombre|lower }} con teléfono publicado. Ya le avisamos al administrador de la guía.</p>
+    {% endfor %}
+    <p class="campo__ayuda">Si alguno de los avisados acepta tarde, lo vas a ver en esta página.</p>
+    {% else %}
+    <h1 class="rubro-titulo">Buscando oficio de guardia…</h1>
+    <p class="esperando">Le avisamos a {{ avisados }} oficio{{ avisados|pluralize }} de {{ pedido.rubro.nombre|lower }}. Esta página se actualiza sola.</p>
+    <p>Si no acepta en unos minutos, pasa automáticamente al siguiente de guardia.</p>
+    {% endif %}
+    <div class="acciones"><form method="post">{% csrf_token %}<button class="boton boton--claro boton--chico" name="accion" value="cancelar">Ya lo resolví, cancelar</button></form></div>
+
+    {# ---- Presupuesto abierto ---- #}
+    {% elif pedido.estado == "abierto" %}
+    <h1 class="rubro-titulo">Respuestas</h1>
+    {% for d in respuestas %}
+    <article class="respuesta">
+      <div class="linea">
+        <a class="entrada__nombre" href="{% url 'directorio:oficio' pedido.city.slug d.oficio.slug %}">{{ d.oficio.nombre }}</a>
+        <span class="linea__puntos" aria-hidden="true"></span>
+        <span class="linea__dato">{% if d.monto %}${{ d.monto }}{% else %}A convenir{% endif %}</span>
+      </div>
+      <p>«{{ d.mensaje }}»</p>
+      <form method="post">{% csrf_token %}<input type="hidden" name="derivacion" value="{{ d.pk }}"><button class="boton boton--chico" name="accion" value="elegir">Elegir a {{ d.oficio.nombre }}</button></form>
+    </article>
+    {% empty %}
+    <p class="esperando">{% if avisados %}Le avisamos a {{ avisados }} oficio{{ avisados|pluralize }}. Todavía no respondió nadie: te avisamos por mail.{% else %}Por ahora no hay oficios disponibles para tu barrio. El administrador de la guía ya está avisado.{% endif %}</p>
+    {% endfor %}
+    <div class="acciones"><form method="post">{% csrf_token %}<button class="boton boton--claro boton--chico" name="accion" value="cancelar">Cancelar pedido</button></form></div>
+
+    {# ---- Cerrado ---- #}
+    {% else %}
+    <h1 class="rubro-titulo">Pedido cerrado</h1>
+    <p>{{ pedido.get_motivo_cierre_display|default:"Este pedido ya no está activo." }}</p>
+    <p><a href="{% url 'core:home' pedido.city.slug %}">Volver a la guía</a></p>
+    {% endif %}
+  </div>
+
+  <aside>
+    <section class="aviso">
+      <div class="aviso__cabeza"><strong>TU PEDIDO</strong> <span class="estado">{{ pedido.get_estado_display }}</span></div>
+      <div class="aviso__cuerpo">{% include "pedidos/_resumen.html" %}</div>
+    </section>
+    <p class="ver-tambien">Guardá esta página: es tu link para seguir el pedido y dejar la reseña. No la compartas, tiene tus datos.</p>
+  </aside>
+</div>
+{% endblock %}

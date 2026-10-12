@@ -1,0 +1,8 @@
+{% autoescape off %}Tu urgencia: teléfonos de guardia
+Hola {{ pedido.nombre_vecino }}:
+
+Ningún oficio de guardia pudo tomar tu pedido a tiempo. En este link tenés los teléfonos de los oficios de guardia para llamarlos directo:
+{{ link }}
+
+Si alguno acepta tu pedido más tarde, también lo vas a ver ahí.
+{% endautoescape %}

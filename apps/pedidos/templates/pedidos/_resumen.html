@@ -1,0 +1,10 @@
+{# Resumen del pedido, común a vecino y oficio. #}
+<dl class="datos">
+  <div><dt>Rubro</dt><span class="linea__puntos" aria-hidden="true"></span><dd>{{ pedido.rubro.nombre }}</dd></div>
+  <div><dt>Barrio</dt><span class="linea__puntos" aria-hidden="true"></span><dd>{{ pedido.barrio.nombre }}</dd></div>
+  <div><dt>Pedido</dt><span class="linea__puntos" aria-hidden="true"></span><dd>{{ pedido.creado_at|date:"D j/n H:i" }}</dd></div>
+</dl>
+<p>{{ pedido.descripcion|linebreaksbr }}</p>
+{% if fotos %}
+<div class="fotos-pedido">{% for f in fotos %}<a href="{{ f.imagen.url }}"><img src="{{ f.imagen.url }}" alt="Foto del pedido {{ forloop.counter }}" loading="lazy"></a>{% endfor %}</div>
+{% endif %}

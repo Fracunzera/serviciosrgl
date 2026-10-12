@@ -1,0 +1,12 @@
+{% autoescape off %}[URGENCIA SIN CUBRIR] {{ pedido.rubro.nombre }} en {{ pedido.barrio.nombre }}
+Ningún oficio de guardia aceptó esta urgencia. Al vecino se le mostró la lista de teléfonos de guardia.
+
+Problema: {{ pedido.descripcion }}
+Barrio: {{ pedido.barrio.nombre }}{% if pedido.direccion %} — {{ pedido.direccion }}{% endif %}
+Vecino: {{ pedido.nombre_vecino }} — {{ pedido.telefono_vecino }}
+
+Avisados: {% for d in pedido.derivaciones.all %}{{ d.oficio.nombre }} ({{ d.get_estado_display }}){% if not forloop.last %}, {% endif %}{% empty %}nadie (no había oficios de guardia en este horario){% endfor %}
+
+Si alguno de los avisados acepta tarde, el pedido se le asigna igual.
+Seguimiento: {{ link }}
+{% endautoescape %}

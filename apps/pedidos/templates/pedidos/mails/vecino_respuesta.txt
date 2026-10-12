@@ -1,0 +1,10 @@
+{% autoescape off %}{{ derivacion.oficio.nombre }} respondió tu pedido de {{ pedido.rubro.nombre|lower }}
+Hola {{ pedido.nombre_vecino }}:
+
+{{ derivacion.oficio.nombre }} respondió:
+"{{ derivacion.mensaje }}"{% if derivacion.monto %}
+Monto estimado: ${{ derivacion.monto }}{% endif %}
+
+Mirá todas las respuestas y elegí acá:
+{{ link }}
+{% endautoescape %}

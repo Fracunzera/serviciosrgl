@@ -6,6 +6,7 @@
   <title>{% block titulo %}Servicios RGL · Guía de oficios de Río Gallegos{% endblock %}</title>
   <meta name="description" content="{% block descripcion %}Guía de oficios de Río Gallegos: plomeros, gasistas, electricistas y cerrajeros verificados, con reseñas de vecinos y guardia de urgencias los fines de semana.{% endblock %}">
   <meta name="theme-color" content="#f7d82d">
+  {% block robots %}{% endblock %}
   <link rel="preload" href="{% static 'fonts/archivo-narrow.woff2' %}" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="{% static 'css/guia.css' %}">
 </head>
@@ -26,6 +27,11 @@
   {% block cabezal %}{% endblock %}
 
   <main>
+    {% if messages %}
+    <div class="mensajes" role="status">
+      {% for m in messages %}<p class="mensaje mensaje--{{ m.tags }}">{{ m }}</p>{% endfor %}
+    </div>
+    {% endif %}
     {% block contenido %}{% endblock %}
   </main>
 

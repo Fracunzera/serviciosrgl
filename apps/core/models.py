@@ -6,6 +6,8 @@ class City(models.Model):
     slug = models.SlugField(unique=True)
     # Las franjas de guardia se interpretan en la hora local de cada ciudad.
     timezone = models.CharField(max_length=64, default="America/Argentina/Rio_Gallegos")
+    # Para armar links wa.me desde teléfonos cargados como "2966 15-123456".
+    codigo_area = models.CharField(max_length=5, default="2966")
     activa = models.BooleanField(default=True)
 
     class Meta:
