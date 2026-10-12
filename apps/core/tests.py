@@ -247,3 +247,36 @@ class PaginasTests(Base):
         r = self.client.get(reverse("core:home", args=["rio-gallegos"]))
         self.assertContains(r, "CÓMO USAR ESTA GUÍA")
         self.assertContains(r, "SEGURIDAD Y CONFIANZA")
+
+
+class RespaldoTests(Base):
+    def test_respaldo_consistente_y_rotacion(self):
+        import sqlite3
+        from io import StringIO
+        from unittest import mock
+
+        from django.core.management import call_command
+
+        datos = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, datos)
+        # Base de verdad en disco (la de tests es en memoria).
+        db = f"{datos}/db.sqlite3"
+        con = sqlite3.connect(db)
+        con.execute("create table t (x)")
+        con.execute("insert into t values (42)")
+        con.commit()
+        con.close()
+        from pathlib import Path
+
+        from datetime import datetime
+
+        dias = [datetime(2026, 10, d, 3, 0) for d in (10, 11, 12)]
+        with override_settings(DATA_DIR=Path(datos), DATABASES={"default": {"NAME": db}}), \
+                mock.patch("apps.core.management.commands.respaldar.timezone.localtime", side_effect=dias):
+            for _ in dias:
+                call_command("respaldar", "--conservar", "2", stdout=StringIO())
+        archivos = sorted(p.name for p in Path(datos, "respaldos").iterdir())
+        self.assertEqual(archivos, ["db-20261011-0300.sqlite3", "db-20261012-0300.sqlite3"])
+        copia = sqlite3.connect(Path(datos, "respaldos", archivos[-1]))
+        self.assertEqual(copia.execute("select x from t").fetchone(), (42,))
+        copia.close()

@@ -18,4 +18,4 @@ RUN useradd --uid 1000 --no-create-home app && mkdir -p /app/data && chown app:a
 USER app
 
 EXPOSE 8000
-CMD ["gunicorn", "config.wsgi", "--bind", "0.0.0.0:8000", "--workers", "2", "--access-logfile", "-"]
+CMD ["gunicorn", "config.wsgi", "--bind", "0.0.0.0:8000", "--workers", "2", "--threads", "4", "--access-logfile", "-"]

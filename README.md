@@ -22,6 +22,8 @@ Con `DJANGO_DEBUG=1` los mails salen por consola y Django sirve `/media/`.
 
 ## Producción (VPS)
 
+Checklist completo (proxy, mail, Telegram, backups, antes de publicar): [docs/DEPLOY.md](docs/DEPLOY.md).
+
 ```sh
 cp .env.example .env                 # completar
 mkdir -p data && sudo chown 1000:1000 data
@@ -32,4 +34,4 @@ docker compose exec web python manage.py createsuperuser
 
 - La web escucha en `127.0.0.1:8000`. Adelante va el reverse proxy, que se encarga de TLS y de la redirección a https, y además sirve `/media/` desde `./data/media`.
 - Completá `TITULAR_NOMBRE`, `TITULAR_DOMICILIO` y `CONTACTO_EMAIL` en `.env`, porque aparecen en Términos y Privacidad. Además, buscá `[COMPLETAR` en `apps/core/templates/core/` para los datos que faltan (fecha, número de registro de la base de datos, proveedor de mail). Antes de publicar, los textos legales tienen que pasar por un abogado.
-- Para el backup en caliente: `sqlite3 data/db.sqlite3 ".backup /ruta/backup.sqlite3"` más una copia de `data/media/`.
+- Backup en caliente: `docker compose exec -T web python manage.py respaldar` (deja `data/respaldos/`) más una copia de `data/media/`.

@@ -7,9 +7,10 @@ services:
     image: serviciosrgl:latest
     env_file: .env
     # Solo web migra, así el worker nunca corre contra un esquema viejo.
+    # --threads: un vecino subiendo fotos con mala señal no bloquea un worker entero.
     command: >
       sh -c "python manage.py migrate --noinput &&
-             exec gunicorn config.wsgi --bind 0.0.0.0:8000 --workers 2 --access-logfile -"
+             exec gunicorn config.wsgi --bind 0.0.0.0:8000 --workers 2 --threads 4 --access-logfile -"
     volumes:
       - ./data:/app/data
     ports:

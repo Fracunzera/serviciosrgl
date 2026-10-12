@@ -42,7 +42,7 @@ serviciosrgl/
 - **`timeout = 5`**, que equivale a `busy_timeout` de 5 s.
 - **PRAGMAs** por conexión: `journal_mode=WAL`, `synchronous=NORMAL` y `foreign_keys=ON`.
 - **Se monta el directorio `./data`, no el archivo.** WAL crea `-wal` y `-shm` al lado de la base. Tiene que ser un disco local: NFS o SMB rompen el locking.
-- **Backup en caliente** con `sqlite3 data/db.sqlite3 ".backup backup.sqlite3"`. Copiar el archivo con `cp` mientras corre puede dejar fuera lo que todavía está en el `-wal`.
+- **Backup en caliente** con `manage.py respaldar`, que usa la API de backup de SQLite y verifica con `integrity_check`. Copiar el archivo con `cp` mientras corre puede dejar fuera lo que todavía está en el `-wal`.
 
 ## Despliegue
 
