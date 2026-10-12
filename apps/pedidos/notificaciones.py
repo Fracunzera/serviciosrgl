@@ -67,6 +67,23 @@ def avisar_oficio(derivacion, plantilla):
     derivacion.save(update_fields=["canales"])
 
 
+def avisar_oficio_general(oficio, plantilla, **extra):
+    """Avisos que no son de un pedido (bienvenida, link de disponibilidad).
+    Solo por mail: son links personales, no tiene sentido reenviarlos a mano."""
+    if not oficio.email:
+        return
+    from django.urls import reverse
+
+    contexto = {
+        "oficio": oficio,
+        "link_disponibilidad": link_disponibilidad(oficio),
+        "link_ficha": settings.SITE_URL + reverse("directorio:oficio", args=[oficio.city.slug, oficio.slug]),
+        **extra,
+    }
+    asunto, texto = _render(plantilla, contexto)
+    _encolar(oficio.email, asunto, texto)
+
+
 def avisar_vecino(pedido, plantilla, **extra):
     if not pedido.email_vecino:
         return

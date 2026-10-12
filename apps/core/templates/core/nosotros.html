@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block titulo %}Nosotros · Servicios RGL{% endblock %}
+{% block contenido %}
+<div class="texto">
+  <h1 class="rubro-titulo">Nosotros</h1>
+  <p>Servicios RGL es una guía de oficios de {{ city.nombre }}, hecha en {{ city.nombre }}.</p>
+  <p>Nació de un problema concreto: los edificios de la ciudad los administran personas que trabajan de lunes a viernes, de 9 a 17. Si un sábado se rompe un caño, se corta la luz o hay olor a gas, no hay a quién llamar. Por eso la guía tiene una <a href="{% url 'pedidos:urgencia' city.slug %}">línea de urgencias</a> que le avisa al oficio que está de guardia.</p>
+  <p>El resto es simple: una guía como las de antes, pero con oficios verificados y opiniones de vecinos que realmente les pidieron un trabajo.</p>
+  <h2>Lo que no hacemos</h2>
+  <p>No cobramos comisiones ni intermediamos pagos: el acuerdo es directo entre vecino y oficio. No vendemos datos ni publicidad personalizada. La guía se sostiene con lo mínimo para pagar el servidor y el dominio.</p>
+  <h2>¿Querés sumarte?</h2>
+  <p>Si sos oficio, <a href="{% url 'directorio:anotate' city.slug %}">anotate</a>. Si conocés a alguien bueno, <a href="{% url 'resenas:recomenda' city.slug %}">recomendalo</a>.</p>
+</div>
+{% endblock %}

@@ -68,15 +68,15 @@ class Oficio(models.Model):
     cubre_toda_la_ciudad = models.BooleanField(default=False)
     barrios = models.ManyToManyField(Barrio, blank=True, related_name="oficios")
     anios_oficio = models.PositiveSmallIntegerField("años de oficio", null=True, blank=True)
-    garantia = models.CharField(max_length=200, blank=True, help_text="Ej.: 6 meses en mano de obra")
-    descripcion = models.TextField(blank=True)
+    garantia = models.CharField("garantía", max_length=200, blank=True, help_text="Ej.: 6 meses en mano de obra")
+    descripcion = models.TextField("descripción", blank=True)
 
     # Privados: nunca se muestran salvo el teléfono en el fallback, y solo
     # con consentimiento (ver Consentimiento).
-    telefono = models.CharField(max_length=30)
+    telefono = models.CharField("teléfono", max_length=30)
     email = models.EmailField(help_text="Por acá le llegan los pedidos y el link mágico.")
 
-    matricula = models.CharField(max_length=60, blank=True)
+    matricula = models.CharField("matrícula", max_length=60, blank=True)
     # No guardamos el número de DNI (minimización de datos, Ley 25.326):
     # solo cuándo se verificó la identidad.
     dni_verificado_at = models.DateTimeField(null=True, blank=True)
@@ -92,7 +92,7 @@ class Oficio(models.Model):
     # Rotación: la urgencia va primero a quien recibió una hace más tiempo.
     ultima_asignacion = models.DateTimeField(null=True, blank=True)
     # Caché del último Consentimiento de tipo fallback (el historial está allá).
-    telefono_en_fallback = models.BooleanField(default=False)
+    telefono_en_fallback = models.BooleanField("teléfono en fallback", default=False)
 
     # Va dentro de cada link firmado. Incrementarlo invalida todos los links
     # vigentes del oficio (p. ej. si reenvió un mail a quien no debía).
@@ -197,6 +197,7 @@ class Consentimiento(models.Model):
 
     class Tipo(models.TextChoices):
         TELEFONO_FALLBACK = "telefono_fallback", "Mostrar mi teléfono en el fallback de urgencias"
+        TERMINOS = "terminos", "Términos y aviso de privacidad"
 
     oficio = models.ForeignKey(Oficio, on_delete=models.CASCADE, related_name="consentimientos")
     tipo = models.CharField(max_length=30, choices=Tipo.choices)
@@ -227,6 +228,14 @@ class FotoTrabajo(models.Model):
     imagen = models.ImageField(upload_to=_ruta_foto)
     descripcion = models.CharField(max_length=200, blank=True)
     orden = models.PositiveSmallIntegerField(default=0)
+
+    def save(self, *args, **kwargs):
+        # Recién subida (admin o formulario de alta): se achica y pierde el EXIF.
+        if self.imagen and not self.imagen._committed:
+            from apps.core.imagenes import achicar
+
+            self.imagen = achicar(self.imagen.file, self.imagen.name)
+        super().save(*args, **kwargs)
 
     class Meta:
         verbose_name = "foto de trabajo"

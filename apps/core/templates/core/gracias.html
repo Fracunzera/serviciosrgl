@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block titulo %}{{ titulo }} · Servicios RGL{% endblock %}
+{% block contenido %}
+<h1 class="rubro-titulo">{{ titulo }}</h1>
+<p class="esperando">{{ texto }}</p>
+<p><a class="boton" href="{% url 'core:home' city.slug %}">Volver a la guía</a></p>
+{% endblock %}

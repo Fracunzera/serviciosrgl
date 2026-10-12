@@ -15,7 +15,7 @@ from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.db import close_old_connections
 
-from apps.pedidos import notificaciones, ruteo
+from apps.pedidos import notificaciones, privacidad, ruteo
 
 log = logging.getLogger(__name__)
 
@@ -56,6 +56,7 @@ class Command(BaseCommand):
         escaladas = ruteo.procesar_urgencias()
         completados = ruteo.autocompletar()
         cerrados = ruteo.cerrar_viejos()
+        privacidad.anonimizar_viejos()
         enviados = notificaciones.enviar_pendientes()
         if escaladas or completados or cerrados or enviados:
             log.info(

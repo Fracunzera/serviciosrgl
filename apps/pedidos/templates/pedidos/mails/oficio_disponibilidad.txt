@@ -1,0 +1,6 @@
+{% autoescape off %}Tu link para marcar disponibilidad
+Hola {{ oficio.nombre }}:
+
+Con este link marcás desde cuándo hasta cuándo no podés tomar trabajos (es personal, no lo reenvíes):
+{{ link_disponibilidad }}
+{% endautoescape %}

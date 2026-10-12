@@ -1,0 +1,14 @@
+{% extends "admin/base_site.html" %}
+{% block content %}
+<p>Vas a suspender:</p>
+<ul>{% for o in oficios %}<li><strong>{{ o.nombre }}</strong> ({{ o.get_estado_display }})</li>{% endfor %}</ul>
+<p>Dejan de figurar en la guía y de recibir pedidos. Sus links se revocan y los pedidos que tenían pendientes pasan a otros oficios. Las reseñas quedan publicadas.</p>
+<form method="post">
+  {% csrf_token %}
+  {{ form.as_p }}
+  {% for id in seleccion %}<input type="hidden" name="_selected_action" value="{{ id }}">{% endfor %}
+  <input type="hidden" name="action" value="{{ accion }}">
+  <input type="submit" name="aplicar" value="Suspender">
+  <a href="{% url 'admin:directorio_oficio_changelist' %}" class="button cancel-link">Cancelar</a>
+</form>
+{% endblock %}

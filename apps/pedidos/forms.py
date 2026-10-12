@@ -19,17 +19,18 @@ class VariosArchivos(forms.ClearableFileInput):
 
 
 class FotosField(forms.ImageField):
-    """Hasta MAX_FOTOS imágenes en un solo input (patrón de la doc de Django)."""
+    """Varias imágenes en un solo input (patrón de la doc de Django)."""
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, max_fotos=MAX_FOTOS, **kwargs):
+        self.max_fotos = max_fotos
         kwargs.setdefault("widget", VariosArchivos(attrs={"accept": "image/*"}))
         kwargs.setdefault("required", False)
         super().__init__(*args, **kwargs)
 
     def clean(self, data, initial=None):
         archivos = [a for a in (data if isinstance(data, (list, tuple)) else [data]) if a]
-        if len(archivos) > MAX_FOTOS:
-            raise forms.ValidationError(f"Podés subir hasta {MAX_FOTOS} fotos.")
+        if len(archivos) > self.max_fotos:
+            raise forms.ValidationError(f"Podés subir hasta {self.max_fotos} fotos.")
         limpias = []
         for a in archivos:
             if a.size > MAX_MB_FOTO * 1024 * 1024:

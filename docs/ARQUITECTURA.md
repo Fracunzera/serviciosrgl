@@ -122,6 +122,30 @@ resenas           │   Pedido ─ Resena >─ Oficio  (1:1 con pedido, o bootst
 - **Fotos.** Se achican a 1600 px de lado y se re-codifican a JPEG. Eso descarta el EXIF, que en fotos de celular trae la ubicación GPS de la casa.
 - **Pedido directo.** Desde la ficha de un oficio, el pedido de presupuesto le llega solo a él. Desde el rubro o la home, a todos los que cubren el barrio.
 
+## Admin y operación diaria
+
+- **Tablero "Para revisar"** al entrar al admin, con lo que pide atención:
+  - oficios para aprobar
+  - urgencias sin cubrir
+  - reclamos abiertos
+  - recomendaciones y advertencias nuevas
+  - mensajes que fallaron
+  - mensajes trabados, que indican que el worker no está corriendo
+
+  Si todo está en cero, no hay nada que hacer.
+- **Acciones sobre oficios** (`directorio/acciones.py`, reutilizables y con tests):
+  - **Aprobar:** exige matrícula si algún rubro la pide, marca el DNI como verificado y manda el mail de bienvenida con el link de disponibilidad. Si estaba suspendido, lo reactiva y le manda links nuevos.
+  - **Suspender:** pide el motivo en una página intermedia. Revoca los links del oficio y libera lo que tenía pendiente: sus urgencias pasan al siguiente y sus presupuestos quedan rechazados.
+  - **Revocar links** y **Mandar link de disponibilidad.**
+- **El estado del oficio no se edita a mano** en el formulario: solo cambia con las acciones, así las reglas se cumplen siempre.
+- **Pedidos y mensajes salientes son de solo lectura.** Se puede cerrar un pedido a mano y reintentar mensajes.
+- **Reseñas de arranque:** desde Reseñas → Agregar, sin pedido, con la fecha real del trabajo. En la ficha se muestran como "Trabajo verificado por la guía".
+- **Alta de oficios por la web** (`/anotate/`):
+  - El perfil queda pendiente.
+  - Las guardias se eligen entre franjas predefinidas y se ajustan en el admin.
+  - Se registran los consentimientos de términos y, aparte, el de mostrar el teléfono en el fallback, con el texto exacto que se aceptó.
+- **Anonimización** (worker): a los `PEDIDOS_ANONIMIZAR_DIAS` días (365) de terminado un pedido se borran los datos del vecino, las fotos y los mails de ese pedido. Quedan rubro, barrio, fechas y la reseña.
+
 ## Monetización (no se construye, solo no se bloquea)
 
 - `base.html` tiene un bloque de footer reservado para sponsor o Cafecito, que se prende con un setting.

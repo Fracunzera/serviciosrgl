@@ -1,0 +1,15 @@
+{% extends "admin/index.html" %}
+{% block content %}
+<div class="module" style="margin-bottom:20px">
+  <h2>Para revisar</h2>
+  <table style="width:100%">
+    {% for i in para_revisar %}
+    <tr>
+      <th scope="row"><a href="{{ i.url }}">{{ i.texto }}</a></th>
+      <td style="text-align:right;font-weight:bold;{% if i.cantidad %}color:#ba2121{% endif %}">{{ i.cantidad }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+{{ block.super }}
+{% endblock %}

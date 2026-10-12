@@ -6,4 +6,5 @@ def guia(request):
     return {
         "EDICION": timezone.localdate().year,
         "FACEBOOK_GRUPO_URL": settings.FACEBOOK_GRUPO_URL,
+        "CONTACTO_EMAIL": settings.CONTACTO_EMAIL,
     }

@@ -1,0 +1,7 @@
+{% autoescape off %}Recibimos tu solicitud para la guía
+Hola {{ oficio.nombre }}:
+
+Recibimos tus datos. Antes de publicar tu perfil te vamos a contactar para verificar tu identidad con tu DNI{% if oficio.matricula %} y tu matrícula{% endif %}.
+
+Cuando esté aprobado te llega un mail con el link a tu ficha.
+{% endautoescape %}

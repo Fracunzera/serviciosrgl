@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block titulo %}Términos · Servicios RGL{% endblock %}
+{% block contenido %}
+<div class="texto">
+  <h1 class="rubro-titulo">Términos y condiciones</h1>
+  <p><em>Última actualización: [COMPLETAR: fecha].</em></p>
+
+  <h2>1. Qué es Servicios RGL</h2>
+  <p>Servicios RGL (la «guía»), de {{ TITULAR_NOMBRE }}, es un directorio de oficios de {{ city.nombre }} que pone en contacto a vecinos con personas que ofrecen trabajos de oficio (los «oficios»).</p>
+
+  <h2>2. La guía conecta, no ejecuta ni cobra</h2>
+  <p>La guía <strong>no presta los servicios</strong> publicados, no es empleadora ni representante de los oficios y no forma parte del acuerdo entre vecino y oficio. El precio, la forma de pago, los plazos y la garantía del trabajo se acuerdan directamente entre ellos. La guía <strong>no intermedia pagos ni cobra comisiones</strong>.</p>
+
+  <h2>3. Qué verifica la guía</h2>
+  <p>Antes de publicar un perfil, la guía verifica la identidad del oficio con su DNI y, en gas y electricidad, que declare una matrícula, que se controla. Esta verificación no es una garantía sobre la calidad, el precio ni el resultado de los trabajos. Las reseñas son opiniones de vecinos que pidieron un trabajo por la guía.</p>
+
+  <h2>4. Línea de urgencias</h2>
+  <p>La línea de urgencias deriva el pedido a los oficios que declararon estar de guardia, de a uno, hasta que alguno acepte. Es un servicio de mejor esfuerzo: <strong>la guía no garantiza que un oficio acepte ni el tiempo de llegada</strong>. No reemplaza a los servicios de emergencia: ante fuego, escape de gas grave o riesgo para personas, llamá al 100, 101 o 107.</p>
+
+  <h2>5. Reseñas</h2>
+  <p>Solo puede reseñar quien tuvo un pedido con ese oficio a través de la guía. Las reseñas no pueden contener insultos, datos personales de terceros ni contenido falso. La guía puede ocultar las que no cumplan estas reglas. Además, la guía puede publicar reseñas iniciales de trabajos que verificó por otros medios, identificadas como tales.</p>
+
+  <h2>6. Obligaciones de los oficios</h2>
+  <p>Los oficios deben dar datos verdaderos, mantener vigente su matrícula cuando corresponda, cumplir lo que acuerdan y responder por su trabajo. La guía puede suspender un perfil por incumplimientos, reclamos fundados o datos falsos. Un perfil suspendido deja de figurar y de recibir pedidos; sus reseñas quedan publicadas.</p>
+
+  <h2>7. Datos personales</h2>
+  <p>El tratamiento de datos se rige por el <a href="{% url 'core:privacidad' city.slug %}">aviso de privacidad</a>.</p>
+
+  <h2>8. Cambios, ley aplicable</h2>
+  <p>La guía puede modificar estos términos publicando la nueva versión en esta página. Se aplica la ley de la República Argentina. [COMPLETAR: jurisdicción — p. ej., tribunales ordinarios de {{ city.nombre }}, Santa Cruz, sin perjuicio de los derechos del consumidor].</p>
+</div>
+{% endblock %}

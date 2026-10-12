@@ -1,0 +1,12 @@
+{% autoescape off %}[Para aprobar] {{ oficio.nombre }} — {% for r in oficio.rubros.all %}{{ r.nombre }}{% if not forloop.last %}, {% endif %}{% endfor %}
+Se anotó un oficio nuevo. Queda pendiente hasta que lo apruebes.
+
+Nombre: {{ oficio.nombre }}
+Teléfono: {{ oficio.telefono }}
+Mail: {{ oficio.email }}
+Matrícula: {{ oficio.matricula|default:"—" }}
+Guardia: {% if oficio.de_guardia %}sí ({% for f in oficio.franjas.all %}{{ f }}{% if not forloop.last %}, {% endif %}{% endfor %}){% else %}no{% endif %}
+
+Verificá el DNI{% if oficio.matricula %} y la matrícula{% endif %} y aprobalo desde el admin:
+{{ link_admin }}
+{% endautoescape %}

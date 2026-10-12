@@ -2,6 +2,7 @@ from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.db.models import Q
+from django.utils import timezone
 
 from apps.core.models import City
 from apps.directorio.models import Oficio
@@ -31,7 +32,8 @@ class Resena(models.Model):
 
     estado = models.CharField(max_length=10, choices=Estado.choices, default=Estado.PUBLICADA)
     motivo_moderacion = models.TextField(blank=True)
-    creado_at = models.DateTimeField(auto_now_add=True)
+    # Editable: en las de bootstrap va la fecha real del trabajo.
+    creado_at = models.DateTimeField("fecha", default=timezone.now)
 
     class Meta:
         verbose_name = "reseña"

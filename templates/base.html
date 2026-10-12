@@ -38,6 +38,17 @@
   <footer class="pie">
     <hr class="filete-doble">
     <p class="pie__aviso">La guía conecta vecinos con oficios de la ciudad. No ejecuta los trabajos ni intermedia pagos: el acuerdo y el pago son directos entre el vecino y el oficio.</p>
+    {% if city %}
+    <nav class="pie__links" aria-label="Páginas de la guía">
+      <a href="{% url 'core:nosotros' city.slug %}">Nosotros</a>
+      <a href="{% url 'core:contacto' city.slug %}">Contacto</a>
+      <a href="{% url 'core:terminos' city.slug %}">Términos</a>
+      <a href="{% url 'core:privacidad' city.slug %}">Privacidad</a>
+      <a href="{% url 'directorio:anotate' city.slug %}">¿Sos oficio? Anotate</a>
+      <a href="{% url 'resenas:recomenda' city.slug %}">Recomendá un oficio</a>
+      <a href="{% url 'resenas:adverti' city.slug %}">Advertí sobre un oficio</a>
+    </nav>
+    {% endif %}
     {% if FACEBOOK_GRUPO_URL %}<p><a href="{{ FACEBOOK_GRUPO_URL }}" rel="noopener">Sumate al grupo de vecinos en Facebook</a></p>{% endif %}
     {% block sponsor %}{% endblock %}
     <p>Servicios RGL · {% if city %}{{ city.nombre }}{% else %}Río Gallegos{% endif %}, Santa Cruz · Edición {{ EDICION }}</p>

@@ -1,0 +1,9 @@
+{% autoescape off %}Tu perfil volvió a estar activo en la guía
+Hola {{ oficio.nombre }}:
+
+Tu perfil está activo otra vez y vuelve a recibir pedidos:
+{{ link_ficha }}
+
+Tus links anteriores ya no sirven. Este es tu nuevo link de disponibilidad:
+{{ link_disponibilidad }}
+{% endautoescape %}

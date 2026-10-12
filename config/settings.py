@@ -48,7 +48,7 @@ CSRF_TRUSTED_ORIGINS = env_list("DJANGO_CSRF_TRUSTED_ORIGINS")
 SITE_URL = env("SITE_URL", "http://localhost:8000").rstrip("/")
 
 INSTALLED_APPS = [
-    "django.contrib.admin",
+    "apps.core.admin_apps.GuiaAdminConfig",  # admin con tablero "Para revisar"
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
@@ -197,6 +197,16 @@ LINKS_OFICIO_DIAS = int(env("LINKS_OFICIO_DIAS", "60"))
 # Antispam: pedidos por teléfono por hora.
 PEDIDOS_POR_TELEFONO_POR_HORA = 3
 FACEBOOK_GRUPO_URL = env("FACEBOOK_GRUPO_URL", "")
+# Pasados N días de cerrado/completado, se borran los datos del vecino del
+# pedido (nombre, teléfono, mail, dirección, descripción, fotos) y los mails
+# enviados. Quedan rubro, barrio, fechas y la reseña. Lo promete el aviso de
+# privacidad: si se cambia, actualizar el texto.
+PEDIDOS_ANONIMIZAR_DIAS = int(env("PEDIDOS_ANONIMIZAR_DIAS", "365"))
+
+# Datos del responsable para Términos y Aviso de privacidad (Ley 25.326).
+TITULAR_NOMBRE = env("TITULAR_NOMBRE", "[COMPLETAR: nombre o razón social]")
+TITULAR_DOMICILIO = env("TITULAR_DOMICILIO", "[COMPLETAR: domicilio], Río Gallegos, Santa Cruz")
+CONTACTO_EMAIL = env("CONTACTO_EMAIL", ADMIN_EMAIL or "[COMPLETAR: mail de contacto]")
 
 # --- Seguridad detrás del reverse proxy --------------------------------------
 if not DEBUG:

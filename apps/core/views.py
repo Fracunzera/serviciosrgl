@@ -40,3 +40,13 @@ def home(request, city_slug):
         "indice": indice,
         "urgencias": [r for r in rubros if r.en_urgencias],
     })
+
+
+def pagina(request, city_slug, plantilla):
+    """Páginas fijas: nosotros, contacto, términos, privacidad."""
+    return render(request, f"core/{plantilla}.html", {
+        "city": get_city(city_slug),
+        "TITULAR_NOMBRE": settings.TITULAR_NOMBRE,
+        "TITULAR_DOMICILIO": settings.TITULAR_DOMICILIO,
+        "ANONIMIZAR_DIAS": settings.PEDIDOS_ANONIMIZAR_DIAS,
+    })

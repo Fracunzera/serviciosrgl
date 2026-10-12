@@ -30,6 +30,6 @@
   {% for o in oficios %}{% include "directorio/_entrada.html" %}{% endfor %}
 </div>
 {% else %}
-<p class="vacio">Todavía no hay oficios de {{ rubro.nombre|lower }} en la guía. ¿Conocés a alguien bueno? Pronto vas a poder recomendarlo.</p>
+<p class="vacio">Todavía no hay oficios de {{ rubro.nombre|lower }} en la guía. ¿Conocés a alguien bueno? <a href="{% url 'resenas:recomenda' city.slug %}">Recomendalo</a>.</p>
 {% endif %}
 {% endblock %}

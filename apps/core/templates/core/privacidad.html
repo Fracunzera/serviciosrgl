@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block titulo %}Aviso de privacidad · Servicios RGL{% endblock %}
+{% block contenido %}
+<div class="texto">
+  <h1 class="rubro-titulo">Aviso de privacidad</h1>
+  <p><em>Última actualización: [COMPLETAR: fecha]. Ley 25.326 de Protección de los Datos Personales.</em></p>
+
+  <h2>Responsable</h2>
+  <p>{{ TITULAR_NOMBRE }}, con domicilio en {{ TITULAR_DOMICILIO }}. Contacto: <a href="mailto:{{ CONTACTO_EMAIL }}">{{ CONTACTO_EMAIL }}</a>.<br>
+  Base de datos inscripta en el Registro Nacional de Bases de Datos: [COMPLETAR: número de inscripción].</p>
+
+  <h2>Qué datos tratamos</h2>
+  <ul>
+    <li><strong>Vecinos que hacen un pedido:</strong> nombre, teléfono, mail (opcional en urgencias), barrio, dirección (si la das), la descripción del trabajo y las fotos que subas. A las fotos les borramos la ubicación GPS que suelen traer.</li>
+    <li><strong>Oficios:</strong> nombre, teléfono, mail, rubros, zona, matrícula, años de oficio, descripción y fotos de trabajos. La identidad se verifica con el DNI, pero <strong>no guardamos el número de DNI</strong>.</li>
+    <li><strong>Reseñas:</strong> el texto, las estrellas y la firma que elijas.</li>
+  </ul>
+  <p>No usamos herramientas de analítica ni publicidad. Las únicas cookies son las técnicas necesarias para que los formularios funcionen.</p>
+
+  <h2>Para qué</h2>
+  <p>Para conectar vecinos con oficios: derivar pedidos, avisar por mail, mostrar las respuestas, permitir reseñas y atender reclamos. No vendemos ni cedemos datos para otros fines.</p>
+
+  <h2>Con quién se comparten</h2>
+  <ul>
+    <li>Tu teléfono, nombre y dirección de vecino <strong>solo los ve el oficio que acepta tu urgencia o que elegís</strong> en un presupuesto. Antes de eso, los oficios ven solo el rubro, el barrio, la descripción y las fotos.</li>
+    <li>El teléfono de un oficio lo ve el vecino que lo eligió. En la lista de urgencias aparece solo si el oficio lo autorizó expresamente.</li>
+    <li>Usamos un proveedor de envío de mails, que trata los datos solo para enviarlos: [COMPLETAR: proveedor].</li>
+  </ul>
+
+  <h2>Cuánto tiempo</h2>
+  <p>Los datos del vecino en un pedido se borran a los {{ ANONIMIZAR_DIAS }} días de terminado (quedan solo el rubro, el barrio y la fecha, para estadísticas, y la reseña si la dejaste). Los datos de un oficio se conservan mientras su perfil exista; si pide la baja, se borran, salvo las reseñas recibidas, que se mantienen sin sus datos de contacto.</p>
+
+  <h2>Tus derechos</h2>
+  <p>Podés pedir <strong>acceso</strong> a tus datos (en forma gratuita, a intervalos no menores a seis meses, salvo interés legítimo), y su <strong>rectificación, actualización o supresión</strong>, escribiendo a <a href="mailto:{{ CONTACTO_EMAIL }}">{{ CONTACTO_EMAIL }}</a>. Respondemos el acceso dentro de los 10 días corridos y la rectificación o supresión dentro de los 5 días hábiles (arts. 14 y 16, Ley 25.326). Los oficios pueden revocar en cualquier momento la autorización para mostrar su teléfono en urgencias.</p>
+
+  <p class="leyenda">La AGENCIA DE ACCESO A LA INFORMACIÓN PÚBLICA, en su carácter de Órgano de Control de la Ley N° 25.326, tiene la atribución de atender las denuncias y reclamos que interpongan quienes resulten afectados en sus derechos por incumplimiento de las normas vigentes en materia de protección de datos personales.</p>
+</div>
+{% endblock %}

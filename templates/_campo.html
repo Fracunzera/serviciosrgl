@@ -1,17 +1,20 @@
 {# Un campo de formulario: label, control, ayuda y errores. #}
 <div class="campo{% if campo.errors %} campo--error{% endif %}">
-  {% if campo.field.widget.input_type == "radio" %}
+  {% if campo.widget_type == "radioselect" or campo.widget_type == "checkboxselectmultiple" %}
   <fieldset>
     <legend>{{ campo.label }}{% if campo.field.required %} *{% endif %}</legend>
-    {% if campo.help_text %}<p class="campo__ayuda" id="{{ campo.auto_id }}_ayuda">{{ campo.help_text }}</p>{% endif %}
+    {% if campo.help_text %}<p class="campo__ayuda">{{ campo.help_text }}</p>{% endif %}
     <div class="opciones{% if opciones_clase %} {{ opciones_clase }}{% endif %}">
       {% for opcion in campo %}<label class="opcion">{{ opcion.tag }} <span>{{ opcion.choice_label }}</span></label>{% endfor %}
     </div>
   </fieldset>
+  {% elif campo.widget_type == "checkbox" %}
+  <label class="check">{{ campo }} <span>{{ campo.label }}</span></label>
+  {% if campo.help_text %}<p class="campo__ayuda">{{ campo.help_text }}</p>{% endif %}
   {% else %}
   <label for="{{ campo.id_for_label }}">{{ campo.label }}{% if campo.field.required %} *{% endif %}</label>
   {{ campo }}
-  {% if campo.help_text %}<p class="campo__ayuda" id="{{ campo.auto_id }}_ayuda">{{ campo.help_text }}</p>{% endif %}
+  {% if campo.help_text %}<p class="campo__ayuda">{{ campo.help_text }}</p>{% endif %}
   {% endif %}
   {% for e in campo.errors %}<p class="campo__error" role="alert">✖ {{ e }}</p>{% endfor %}
 </div>

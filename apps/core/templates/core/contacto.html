@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block titulo %}Contacto · Servicios RGL{% endblock %}
+{% block contenido %}
+<div class="texto">
+  <h1 class="rubro-titulo">Contacto</h1>
+  <div class="aviso telefonos">
+    <div class="aviso__cuerpo">
+      <div class="linea"><span>Mail</span><span class="linea__puntos" aria-hidden="true"></span><a class="linea__dato" href="mailto:{{ CONTACTO_EMAIL }}">{{ CONTACTO_EMAIL }}</a></div>
+      {% if FACEBOOK_GRUPO_URL %}<div class="linea"><span>Grupo de vecinos</span><span class="linea__puntos" aria-hidden="true"></span><a class="linea__dato" href="{{ FACEBOOK_GRUPO_URL }}" rel="noopener">Facebook</a></div>{% endif %}
+    </div>
+  </div>
+  <h2>Para casos puntuales</h2>
+  <ul>
+    <li>Problema con un pedido: usá «Tuve un problema» en el link de tu pedido.</li>
+    <li><a href="{% url 'resenas:adverti' city.slug %}">Advertir sobre un oficio</a> · <a href="{% url 'resenas:recomenda' city.slug %}">Recomendar uno</a></li>
+    <li>Sos oficio y querés figurar: <a href="{% url 'directorio:anotate' city.slug %}">anotate</a>.</li>
+    <li>Tus datos personales (acceso, corrección o borrado): escribinos al mail. Ver el <a href="{% url 'core:privacidad' city.slug %}">aviso de privacidad</a>.</li>
+  </ul>
+  <p><strong>La guía no atiende emergencias.</strong> Ante fuego, escape de gas grave o riesgo para alguien: Bomberos <a href="tel:100">100</a> · Policía <a href="tel:101">101</a> · Emergencias médicas <a href="tel:107">107</a>.</p>
+</div>
+{% endblock %}

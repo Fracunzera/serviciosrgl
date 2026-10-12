@@ -1,0 +1,9 @@
+{% autoescape off %}[{{ reporte.get_tipo_display }}] {{ reporte.nombre_oficio }}
+Llegó una {{ reporte.get_tipo_display|lower }} desde la web.
+
+Oficio: {{ reporte.nombre_oficio }}{% if reporte.rubro %} ({{ reporte.rubro }}){% endif %}{% if reporte.telefono_oficio %} — {{ reporte.telefono_oficio }}{% endif %}
+Texto: {{ reporte.texto }}
+Contacto de quien lo envía: {{ reporte.contacto|default:"no dejó" }}
+
+Revisalo en el admin: {{ link_admin }}
+{% endautoescape %}

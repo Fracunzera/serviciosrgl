@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block titulo %}{{ titulo }} · Servicios RGL{% endblock %}
+{% block contenido %}
+<p class="migas"><a href="{% url 'core:home' city.slug %}">Índice</a> › {{ titulo }}</p>
+<h1 class="rubro-titulo">{{ titulo }}</h1>
+<p class="ver-tambien">{{ bajada }}</p>
+<form class="formulario aviso" method="post" novalidate>
+  <div class="aviso__cuerpo">
+    {% csrf_token %}
+    {% for campo in form.visible_fields %}{% if campo.name != "sitio_web" %}{% include "_campo.html" %}{% endif %}{% endfor %}
+    {% include "pedidos/_honeypot.html" %}
+    <div class="acciones"><button class="boton" type="submit">Enviar</button></div>
+  </div>
+</form>
+{% endblock %}

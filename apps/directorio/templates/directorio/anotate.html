@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block titulo %}Anotate en la guía · Servicios RGL{% endblock %}
+
+{% block cabezal %}
+<div class="cabezal"><span>Alta de oficios</span><span class="cabezal__centro">{{ city.nombre }}</span><span>Sin costo</span></div>
+{% endblock %}
+
+{% block contenido %}
+<p class="migas"><a href="{% url 'core:home' city.slug %}">Índice</a> › Anotate</p>
+<h1 class="rubro-titulo">Anotate en la guía</h1>
+<p class="ver-tambien">Sin costo y sin comisiones: los trabajos los arreglás directo con el vecino. Antes de publicarte verificamos tu identidad con tu DNI y, en gas y electricidad, tu matrícula.</p>
+
+<form class="formulario aviso" method="post" enctype="multipart/form-data" novalidate>
+  <div class="aviso__cuerpo">
+    {% csrf_token %}
+    {% for e in form.non_field_errors %}<p class="campo__error" role="alert">✖ {{ e }}</p>{% endfor %}
+    {% include "_campo.html" with campo=form.nombre %}
+    {% include "_campo.html" with campo=form.rubros opciones_clase="opciones--texto" %}
+    {% include "_campo.html" with campo=form.matricula %}
+    {% include "_campo.html" with campo=form.descripcion %}
+    {% include "_campo.html" with campo=form.anios_oficio %}
+    {% include "_campo.html" with campo=form.garantia %}
+    {% include "_campo.html" with campo=form.fotos %}
+    <hr class="filete">
+    {% include "_campo.html" with campo=form.cubre_toda_la_ciudad %}
+    {% include "_campo.html" with campo=form.barrios opciones_clase="opciones--texto" %}
+    <hr class="filete">
+    {% include "_campo.html" with campo=form.franjas opciones_clase="opciones--texto" %}
+    {% include "_campo.html" with campo=form.consiento_fallback %}
+    <hr class="filete">
+    {% include "_campo.html" with campo=form.telefono %}
+    {% include "_campo.html" with campo=form.email %}
+    {% include "_campo.html" with campo=form.acepto_terminos %}
+    <p class="campo__ayuda"><a href="{% url 'core:terminos' city.slug %}" target="_blank">Términos</a> · <a href="{% url 'core:privacidad' city.slug %}" target="_blank">Aviso de privacidad</a></p>
+    {% include "pedidos/_honeypot.html" %}
+    <div class="acciones"><button class="boton boton--grande" type="submit">Enviar mis datos</button></div>
+  </div>
+</form>
+{% endblock %}

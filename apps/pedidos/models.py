@@ -69,6 +69,8 @@ class Pedido(models.Model):
     motivo_cierre = models.CharField(max_length=15, choices=MotivoCierre.choices, blank=True)
     # Urgencia: momento en que se agotó la cola y se mostró el fallback.
     fallback_at = models.DateTimeField(null=True, blank=True)
+    # Datos del vecino borrados (ver privacidad.anonimizar_viejos).
+    anonimizado_at = models.DateTimeField(null=True, blank=True)
 
     creado_at = models.DateTimeField(auto_now_add=True)
     actualizado_at = models.DateTimeField(auto_now=True)

@@ -1,8 +1,12 @@
 from django.http import Http404
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, redirect, render
+from django.views.decorators.http import require_http_methods
 
 from apps.core.views import get_city, sin_acentos
 from apps.directorio.models import Oficio, Rubro
+
+from .alta import registrar_alta
+from .forms import AltaOficioForm
 
 
 def rubro(request, city_slug, slug):
@@ -44,4 +48,26 @@ def oficio(request, city_slug, slug):
         "oficio": oficio,
         "resenas": oficio.resenas.filter(estado="publicada").select_related("pedido__barrio"),
         "suspendido": oficio.estado == Oficio.Estado.SUSPENDIDO,
+    })
+
+
+@require_http_methods(["GET", "POST"])
+def anotate(request, city_slug):
+    city = get_city(city_slug)
+    if request.method == "POST":
+        form = AltaOficioForm(request.POST, request.FILES, city=city)
+        if form.is_valid():
+            registrar_alta(form)
+            return redirect("directorio:anotate_gracias", city_slug=city.slug)
+    else:
+        form = AltaOficioForm(city=city)
+    return render(request, "directorio/anotate.html", {"city": city, "form": form})
+
+
+def anotate_gracias(request, city_slug):
+    return render(request, "core/gracias.html", {
+        "city": get_city(city_slug),
+        "titulo": "Recibimos tus datos",
+        "texto": "Antes de publicar tu perfil te vamos a contactar para verificar tu identidad con tu DNI "
+                 "(y tu matrícula, si corresponde). Cuando esté aprobado te llega un mail con el link a tu ficha.",
     })

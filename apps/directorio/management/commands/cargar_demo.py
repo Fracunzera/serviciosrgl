@@ -13,6 +13,7 @@ from django.utils import timezone
 from django.utils.text import slugify
 
 from apps.core.models import Barrio, City
+from apps.directorio.forms import TEXTO_FALLBACK
 from apps.directorio.models import Consentimiento, FranjaGuardia, Oficio, Rubro
 from apps.resenas.models import Resena
 
@@ -74,7 +75,6 @@ EXTRA = [
     ("Plomero Suspendido", ["Plomería"], Oficio.Estado.SUSPENDIDO, "Demo: no se presentó a dos trabajos aceptados."),
 ]
 
-TEXTO_CONSENTIMIENTO = "Acepto que mi teléfono se muestre en la lista de urgencias cuando ningún oficio de guardia acepte el pedido."
 
 
 def nombre_guia(nombre):
@@ -120,7 +120,7 @@ class Command(BaseCommand):
             for dia, desde, hasta in franjas:
                 o.franjas.create(dia=dia, desde=desde, hasta=hasta)
             if franjas and not o.telefono_en_fallback:
-                Consentimiento.registrar(o, Consentimiento.Tipo.TELEFONO_FALLBACK, True, TEXTO_CONSENTIMIENTO)
+                Consentimiento.registrar(o, Consentimiento.Tipo.TELEFONO_FALLBACK, True, TEXTO_FALLBACK)
             o.resenas.filter(bootstrap=True).delete()
             for j, (autor, estrellas, texto) in enumerate(resenas):
                 r = Resena.objects.create(oficio=o, bootstrap=True, autor=autor, estrellas=estrellas, texto=texto)

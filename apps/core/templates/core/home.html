@@ -61,4 +61,30 @@
     </div>
   </section>
 </div>
+
+<div class="confianza">
+  <section class="aviso" aria-labelledby="titulo-como">
+    <div class="aviso__cabeza"><strong id="titulo-como">CÓMO USAR ESTA GUÍA</strong></div>
+    <div class="aviso__cuerpo">
+      <ol class="pasos">
+        <li><strong>Buscá por rubro</strong> y mirá la ficha de cada oficio: zona, años de oficio, garantía y lo que opinan los vecinos.</li>
+        <li><strong>Pedí presupuesto</strong> a todos los de tu barrio o a uno en particular. Te responden por la guía y vos elegís. Tu teléfono se comparte solo con el que elijas.</li>
+        <li><strong>Arreglá directo</strong> con el oficio: la guía no cobra comisiones. Cuando termina, dejá tu reseña.</li>
+      </ol>
+      <p>¿Urgencia un sábado? <a href="{% url 'pedidos:urgencia' city.slug %}">La línea de urgencias</a> le avisa al oficio que está de guardia.</p>
+    </div>
+  </section>
+
+  <section class="aviso" aria-labelledby="titulo-confianza">
+    <div class="aviso__cabeza"><strong id="titulo-confianza">SEGURIDAD Y CONFIANZA</strong></div>
+    <div class="aviso__cuerpo">
+      <ul class="sellos-lista">
+        <li><span class="sello">✔ Verificado</span> Cada perfil lo aprueba la guía después de verificar el DNI.</li>
+        <li><span class="sello">Matrícula</span> En gas y electricidad, la matrícula es obligatoria y la controlamos.</li>
+        <li><span class="sello">★ Reseñas</span> Solo opinan vecinos que pidieron el trabajo por la guía.</li>
+        <li><span class="sello sello--negro">Si incumple, sale</span> Un oficio que no cumple se suspende y deja de figurar.</li>
+      </ul>
+    </div>
+  </section>
+</div>
 {% endblock %}

@@ -1,0 +1,15 @@
+{% autoescape off %}Ya estás en la guía de oficios de {{ oficio.city.nombre }}
+Hola {{ oficio.nombre }}:
+
+Aprobamos tu perfil. Ya figurás en la guía con el sello de verificado:
+{{ link_ficha }}
+
+Cómo te van a llegar los trabajos:
+- Pedidos de presupuesto: te llega un mail con un link para responder. El vecino elige y, si te elige, ves su contacto.
+{% if oficio.de_guardia %}- Urgencias: en tus horarios de guardia te llega un aviso con un link para aceptar. Tenés unos minutos; si no, pasa al siguiente.
+{% endif %}
+Si te vas de vacaciones o no podés tomar trabajos, marcalo acá (guardá este link, es personal):
+{{ link_disponibilidad }}
+
+La guía no cobra comisiones: el acuerdo y el pago son directos con el vecino.
+{% endautoescape %}
